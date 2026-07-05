@@ -85,6 +85,15 @@
             transform: translateY(-8px);
             box-shadow: 0 20px 40px rgba(0,0,0,0.1);
         }
+
+        /* Form styling */
+        .form-input {
+            transition: all 0.2s ease;
+        }
+        .form-input:focus {
+            outline: none;
+            ring: 2px solid #3b82f6;
+        }
     </style>
 </head>
 <body class="text-gray-800 pb-24 md:pb-0 overflow-x-hidden">
@@ -170,6 +179,62 @@
                 <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25"></path></svg>
                 Artikel Terbaru
             </h2>
+            
+            <!-- FORM TAMBAH ARTIKEL -->
+            <div class="glass-card p-6 rounded-2xl mb-6">
+                <h3 class="text-xl font-bold text-dark-purple mb-4 flex items-center gap-2">
+                    <svg class="w-6 h-6 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                    </svg>
+                    Tambah Artikel Baru
+                </h3>
+                <form id="add-article-form" class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Judul *</label>
+                        <input type="text" id="article-title" required 
+                               class="form-input w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Konten *</label>
+                        <textarea id="article-content" rows="4" required 
+                                  class="form-input w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Penulis *</label>
+                        <input type="text" id="article-author" required 
+                               class="form-input w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">URL Gambar (Opsional)</label>
+                        <input type="url" id="article-image" 
+                               placeholder="https://images.unsplash.com/photo-xxx" 
+                               class="form-input w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                        <select id="article-status" 
+                                class="form-input w-full px-4 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                            <option value="published">Published</option>
+                            <option value="draft">Draft</option>
+                        </select>
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="submit" 
+                                class="bg-blue-600 text-white font-bold py-2 px-6 rounded-xl hover:bg-blue-700 transition shadow-lg flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                            </svg>
+                            Simpan Artikel
+                        </button>
+                        <button type="reset" 
+                                class="bg-gray-300 text-gray-700 font-bold py-2 px-6 rounded-xl hover:bg-gray-400 transition">
+                            Reset
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- DAFTAR ARTIKEL -->
             <div id="articles-container" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="text-center text-gray-500 col-span-3 py-10">
                     <div class="spinner"></div>
@@ -203,7 +268,7 @@
         API_URL: 'https://script.google.com/macros/s/AKfycbyM4sm7wgX0IYn2WNYYgY6qWcrqF_4egquQZ5u0NaTl03fRWQaNP69p5eKjuAjlQ44e/exec',
         
         // Kalo true pake data contoh, kalo false pake API
-        USE_DUMMY: true // Set false kalo udah deploy API
+        USE_DUMMY: false // ← Ubah ke false untuk pakai API
     };
 
     // ==============================================
@@ -343,6 +408,53 @@
             console.error('❌ Error fetchData:', error);
             console.log('⚠️ Fallback ke data dummy...');
             return DUMMY_DATA;
+        }
+    }
+
+    // ==============================================
+    // TAMBAH ARTIKEL VIA API
+    // ==============================================
+    async function addArticleToAPI(formData) {
+        try {
+            if (CONFIG.USE_DUMMY) {
+                console.log('📦 Mode dummy: Artikel ditambahkan ke data dummy');
+                // Tambahkan ke dummy data
+                const newArticle = {
+                    id: DUMMY_DATA.articles.length + 1,
+                    title: formData.title,
+                    content: formData.content,
+                    author: formData.author,
+                    date: new Date().toISOString().split('T')[0],
+                    image_url: formData.image_url || '',
+                    status: formData.status || 'published'
+                };
+                DUMMY_DATA.articles.unshift(newArticle);
+                return { success: true, data: newArticle };
+            }
+            
+            console.log('🌐 Menambahkan artikel ke API...');
+            const response = await fetch(CONFIG.API_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: new URLSearchParams({
+                    action: 'addArticle',
+                    title: formData.title,
+                    content: formData.content,
+                    author: formData.author,
+                    image_url: formData.image_url || '',
+                    status: formData.status || 'published'
+                })
+            });
+            
+            console.log('✅ Artikel berhasil ditambahkan!');
+            return { success: true };
+            
+        } catch (error) {
+            console.error('❌ Error add article:', error);
+            return { success: false, error: error.message };
         }
     }
 
@@ -587,6 +699,58 @@
     async function init() {
         console.log('🚀 TeachNwrite CMS - Loading...');
         console.log(`📌 Mode: ${CONFIG.USE_DUMMY ? 'DUMMY' : 'API'}`);
+        
+        // Setup form submit
+        const form = document.getElementById('add-article-form');
+        if (form) {
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    title: document.getElementById('article-title').value.trim(),
+                    content: document.getElementById('article-content').value.trim(),
+                    author: document.getElementById('article-author').value.trim(),
+                    image_url: document.getElementById('article-image').value.trim(),
+                    status: document.getElementById('article-status').value
+                };
+                
+                // Validasi
+                if (!formData.title || !formData.content || !formData.author) {
+                    alert('⚠️ Mohon isi semua field yang wajib (Judul, Konten, Penulis)!');
+                    return;
+                }
+                
+                // Tampilkan loading
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = `
+                    <svg class="w-5 h-5 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                    </svg>
+                    Menyimpan...
+                `;
+                submitBtn.disabled = true;
+                
+                // Kirim ke API
+                const result = await addArticleToAPI(formData);
+                
+                // Reset button
+                submitBtn.innerHTML = originalText;
+                submitBtn.disabled = false;
+                
+                if (result.success) {
+                    alert('✅ Artikel berhasil ditambahkan!');
+                    form.reset();
+                    // Reload data
+                    const data = await fetchData();
+                    if (data.articles) {
+                        renderArticles(data.articles);
+                    }
+                } else {
+                    alert('❌ Gagal menambahkan artikel: ' + (result.error || 'Unknown error'));
+                }
+            });
+        }
         
         // Ambil data
         const data = await fetchData();

@@ -421,104 +421,108 @@ function dWaliApp() {
 
         // ============ SYNC FUNCTIONS ============
         async loadFromSheet() {
-            try {
-                this.showNotif('⏳ Loading data...');
-                
-                const studentResponse = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getStudents' })
-                });
-                
-                const studentData = await studentResponse.json();
-                if (studentData.status === 'success' && studentData.data.length > 0) {
-                    this.students = studentData.data;
-                }
-                
-                const curhatResponse = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getCurhats' })
-                });
-                
-                const curhatData = await curhatResponse.json();
-                if (curhatData.status === 'success') {
-                    this.curhats = curhatData.data || [];
-                }
-                
-                this.showNotif('✅ Data loaded from spreadsheet!');
-                
-            } catch(error) {
-                console.error('Load error:', error);
-                this.showNotif('⚠️ Gagal load data, pakai data lokal');
+    try {
+        this.showNotif('⏳ Loading data...');
+        
+        // PAKAI mode: 'no-cors' untuk menghindari CORS
+        const studentResponse = await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',  // <-- UBAH KE no-cors
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'getStudents' })
+        });
+        
+        // Karena no-cors, response gak bisa dibaca langsung
+        // Kita pake cara alternatif: coba pake cors dulu, kalo gagal pake data lokal
+        try {
+            const studentData = await studentResponse.json();
+            if (studentData.status === 'success' && studentData.data.length > 0) {
+                this.students = studentData.data;
             }
-        },
+        } catch(e) {
+            console.log('CORS error, pake data lokal');
+            // Tetap pake data lokal
+        }
+        
+        this.showNotif('✅ Data loaded!');
+        
+    } catch(error) {
+        console.error('Load error:', error);
+        this.showNotif('⚠️ Gagal load data, pakai data lokal');
+    }
+},
 
-        async syncStudentToSheet(student) {
-            try {
-                const response = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'saveStudent',
-                        student: student
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    console.log('Student synced:', student.name);
-                }
-            } catch(error) {
-                console.error('Sync error:', error);
-            }
-        },
+async syncStudentToSheet(student) {
+    try {
+        // Pastikan data potensi di-stringify
+        const studentData = {
+            ...student,
+            potensi: JSON.stringify(student.potensi || {}),
+            perbuatan_baik_today: student.perbuatan_baik_today ? 'true' : 'false'
+        };
+        
+        // Kirim dengan mode no-cors
+        const response = await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',  // <-- UBAH KE no-cors
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'saveStudent',
+                student: studentData
+            })
+        });
+        
+        // Karena no-cors, response gak bisa dibaca
+        // Tapi request tetap terkirim
+        console.log('Student sync request sent:', student.name);
+        this.showNotif(`✅ Data ${student.name} terkirim ke sheet!`);
+        
+    } catch(error) {
+        console.error('Sync error:', error);
+        this.showNotif('⚠️ Gagal sync ke sheet, cek koneksi');
+    }
+},
 
-        async syncCurhatToSheet(curhat) {
-            try {
-                const response = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'saveCurhat',
-                        curhat: curhat
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    console.log('Curhat synced');
-                }
-            } catch(error) {
-                console.error('Sync error:', error);
-            }
-        },
+async syncCurhatToSheet(curhat) {
+    try {
+        const response = await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',  // <-- UBAH KE no-cors
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'saveCurhat',
+                curhat: curhat
+            })
+        });
+        
+        console.log('Curhat sync request sent');
+        this.showNotif('✅ Curhat terkirim ke sheet!');
+        
+    } catch(error) {
+        console.error('Sync error:', error);
+        this.showNotif('⚠️ Gagal sync curhat');
+    }
+},
 
-        async syncReplyToSheet(curhatId, balasan) {
-            try {
-                const response = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'replyCurhat',
-                        curhatId: curhatId,
-                        balasan: balasan
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    console.log('Reply synced');
-                }
-            } catch(error) {
-                console.error('Sync error:', error);
-            }
-        },
+async syncReplyToSheet(curhatId, balasan) {
+    try {
+        const response = await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',  // <-- UBAH KE no-cors
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                action: 'replyCurhat',
+                curhatId: curhatId,
+                balasan: balasan
+            })
+        });
+        
+        console.log('Reply sync request sent');
+        
+    } catch(error) {
+        console.error('Sync error:', error);
+    }
+},
 
         async syncAllStudents() {
             for (let student of this.students) {

@@ -2,51 +2,14 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>D'WALI - Digital Wali</title>
-    
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- DaisyUI -->
-    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.19/dist/full.min.css" rel="stylesheet" type="text/css" />
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- SheetJS for Excel Export -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'dwali-dark': '#0f3d2e',
-                        'dwali-green': '#166534',
-                        'dwali-light': '#a7f3d0',
-                        'dwali-yellow': '#facc15',
-                        'dwali-red': '#ef4444',
-                        'dwali-success': '#22c55e',
-                    },
-                    fontFamily: {
-                        'jakarta': ['Plus Jakarta Sans', 'sans-serif'],
-                    }
-                }
-            }
-        }
-    </script>
-
     <style>
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0f3d2e;
-            background-image: url('https://images.unsplash.com/photo-1497486751825-1233686d5d80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80');
-            background-size: cover;
-            background-position: center;
-            background-attachment: fixed;
-        }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
         .glass {
             background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(12px);
@@ -54,1213 +17,724 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
         }
         .glass-dark {
-            background: rgba(15, 61, 46, 0.85);
+            background: rgba(6, 78, 59, 0.4);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .chat-bubble-bot {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 16px 16px 16px 4px;
-        }
-        .chat-bubble-user {
-            background: #facc15;
-            color: #0f3d2e;
-            border-radius: 16px 16px 4px 16px;
-        }
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
-        ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 10px; }
-        
-        .spinner {
-            border: 3px solid rgba(255,255,255,0.1);
-            border-radius: 50%;
-            border-top: 3px solid #facc15;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
-            display: inline-block;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .page-enter-active, .page-leave-active {
-            transition: all 0.3s ease;
-        }
-        .page-enter-from, .page-leave-to {
-            opacity: 0;
-            transform: translateY(20px);
-        }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body class="min-h-screen text-white">
+<body class="min-h-screen bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop');">
 
-<div x-data="dwaliApp()" x-init="init()" class="min-h-screen flex flex-col">
+<div x-data="dWaliApp()" x-init="init()" class="min-h-screen w-full flex justify-center text-white">
 
-    <!-- HEADER -->
-    <header class="glass-dark text-white p-4 flex justify-between items-center sticky top-0 z-40">
-        <div class="flex items-center gap-2 cursor-pointer" @click="goToHome()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-dwali-yellow" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l9-5-9-5-9 5 9 5z" />
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" />
-            </svg>
-            <h1 class="text-xl md:text-2xl font-extrabold tracking-wide">D'WALI</h1>
+    <!-- NOTIFICATION TOAST -->
+    <div x-show="notif.show" x-transition class="fixed top-4 left-1/2 -translate-x-1/2 z-50 glass-dark px-6 py-3 rounded-xl shadow-lg">
+        <span x-text="notif.text"></span>
+    </div>
+
+    <!-- LOGIN VIEW -->
+    <div x-show="!isLoggedIn" class="w-full max-w-md p-6 flex flex-col justify-center min-h-screen">
+        <div class="glass rounded-3xl p-8 text-center shadow-2xl">
+            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/50" alt="Logo">
+            <h1 class="text-3xl font-extrabold text-yellow-300 tracking-wide">D'WALI</h1>
+            <p class="text-green-100 text-sm mb-6">Digital Wali Murid</p>
+            
+            <div class="flex gap-2 mb-6 bg-black/20 p-1 rounded-full">
+                <button @click="loginRole='student'" :class="loginRole==='student' ? 'bg-yellow-400 text-green-900' : 'text-white'" class="flex-1 py-2 rounded-full font-semibold transition">Siswa</button>
+                <button @click="loginRole='admin'" :class="loginRole==='admin' ? 'bg-yellow-400 text-green-900' : 'text-white'" class="flex-1 py-2 rounded-full font-semibold transition">Wali Kelas</button>
+            </div>
+
+            <!-- Student Login -->
+            <div x-show="loginRole==='student'" class="space-y-3">
+                <input type="text" x-model="loginForm.name" placeholder="Nama Siswa" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                <input type="text" x-model="loginForm.class" placeholder="Kelas (Misal: 7A)" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                <input type="password" x-model="loginForm.pin" placeholder="PIN / Password" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                <button @click="loginStudent()" class="w-full bg-yellow-400 text-green-900 font-bold py-3 rounded-xl hover:bg-yellow-300 transition">Masuk</button>
+            </div>
+
+            <!-- Admin Login -->
+            <div x-show="loginRole==='admin'" class="space-y-3">
+                <input type="email" x-model="loginForm.email" placeholder="Email Wali" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                <input type="password" x-model="loginForm.pass" placeholder="Password" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
+                <button @click="loginAdmin()" class="w-full bg-yellow-400 text-green-900 font-bold py-3 rounded-xl hover:bg-yellow-300 transition">Masuk</button>
+            </div>
         </div>
-        <div x-show="currentUser" class="flex items-center gap-3">
-            <div class="text-right text-sm hidden md:block">
-                <p class="font-bold" x-text="currentUser?.name"></p>
-                <p class="text-xs text-dwali-light" x-text="currentUser?.role === 'admin' ? 'Wali Kelas' : 'Siswa - ' + currentUser?.class"></p>
+    </div>
+
+    <!-- STUDENT VIEW -->
+    <div x-show="isLoggedIn && role==='student'" class="w-full max-w-md pb-24 relative">
+        
+        <!-- MODAL PETA POTENSI -->
+        <div x-show="studentView==='potensi'" class="absolute inset-0 z-40 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
+            <div class="glass rounded-3xl p-6 w-full my-10">
+                <h2 class="text-2xl font-bold text-yellow-300 mb-2">Peta Potensi Siswa</h2>
+                <p class="text-sm text-green-100 mb-4">Lengkapi data diri ini sekali saja.</p>
+                
+                <div class="space-y-4 text-sm">
+                    <div>
+                        <label class="font-semibold block mb-2">Minat (Pilih satu)</label>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="m in ['Olahraga','Seni','Sains','Teknologi','Bahasa','Lainnya']">
+                                <button @click="potensiForm.minat = m" :class="potensiForm.minat===m ? 'bg-yellow-400 text-green-900' : 'bg-white/20'" class="px-3 py-1 rounded-full text-xs" x-text="m"></button>
+                            </template>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-2">Gaya Belajar</label>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="g in ['Visual','Auditori','Kinestetik','Baca/Tulis']">
+                                <button @click="potensiForm.gaya = g" :class="potensiForm.gaya===g ? 'bg-yellow-400 text-green-900' : 'bg-white/20'" class="px-3 py-1 rounded-full text-xs" x-text="g"></button>
+                            </template>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-2">Cita-cita</label>
+                        <textarea x-model="potensiForm.cita_cita" class="w-full bg-white/20 rounded-xl p-3 text-white placeholder-green-100" rows="2" placeholder="Saya ingin menjadi..."></textarea>
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-2">Kekuatan Karakter</label>
+                        <div class="flex flex-wrap gap-2">
+                            <template x-for="k in ['Pemberani','Baik Hati','Kreatif','Pantang Menyerah','Disiplin','Pemimpin','Jujur']">
+                                <button @click="potensiForm.karakter = k" :class="potensiForm.karakter===k ? 'bg-yellow-400 text-green-900' : 'bg-white/20'" class="px-3 py-1 rounded-full text-xs" x-text="k"></button>
+                            </template>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="font-semibold block mb-2">Ekstrakurikuler</label>
+                        <input type="text" x-model="potensiForm.ekskul" class="w-full bg-white/20 rounded-xl p-3 text-white placeholder-green-100" placeholder="Pramuka, Futsal, dll">
+                    </div>
+                </div>
+                <button @click="savePotensi()" class="w-full bg-green-600 mt-6 py-3 rounded-xl font-bold hover:bg-green-500">Simpan & Lanjut</button>
             </div>
-            <button @click="logout()" class="btn btn-sm btn-error btn-outline text-white border-white/20">Logout</button>
         </div>
-    </header>
-
-    <main class="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full">
-
-        <!-- LOADING OVERLAY -->
-        <div x-show="loading" class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm">
-            <div class="glass-dark p-8 rounded-2xl flex flex-col items-center gap-4 shadow-2xl">
-                <div class="spinner"></div>
-                <p class="text-white font-bold text-lg" x-text="loadingMessage || 'Memuat data...'"></p>
-                <div class="w-48 h-1 bg-white/20 rounded-full overflow-hidden">
-                    <div class="h-full bg-dwali-yellow rounded-full transition-all duration-500" :style="`width: ${loadingProgress}%`"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- LOGIN PAGE -->
-        <template x-if="view === 'login'">
-            <div class="flex items-center justify-center min-h-[80vh]">
-                <div class="glass p-8 rounded-3xl w-full max-w-md text-center shadow-2xl">
-                    <h2 class="text-3xl font-extrabold mb-2">Selamat Datang</h2>
-                    <p class="text-dwali-light mb-6">Silakan masuk untuk melanjutkan</p>
-                    
-                    <div class="flex flex-col gap-3">
-                        <button @click="view='student-login'" class="btn btn-block text-white border-dwali-light bg-dwali-green hover:bg-dwali-dark">Login sebagai Siswa</button>
-                        <button @click="view='admin-login'" class="btn btn-block text-dwali-dark bg-dwali-yellow hover:bg-yellow-400 border-yellow-400">Login sebagai Wali Kelas</button>
-                    </div>
-                    
-                    <div class="mt-6 text-xs text-dwali-light/70">
-                        <p class="font-bold text-dwali-yellow">🔑 Akun Demo:</p>
-                        <p>Siswa: Ahmad Fauzi | Kelas: 7A | Pass: siswa123</p>
-                        <p>Wali: admin@dwali.com | Pass: admin123</p>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- STUDENT LOGIN -->
-        <template x-if="view === 'student-login'">
-            <div class="flex items-center justify-center min-h-[80vh]">
-                <div class="glass p-8 rounded-3xl w-full max-w-md shadow-2xl">
-                    <h2 class="text-2xl font-bold mb-4 text-center">Login Siswa</h2>
-                    <form @submit.prevent="studentLogin()" class="space-y-4">
-                        <input type="text" x-model="loginForm.name" placeholder="Nama Siswa" class="input input-bordered w-full bg-white/20 text-white placeholder-gray-300 border-white/30" required>
-                        <input type="text" x-model="loginForm.class" placeholder="Kelas (cth: 7A)" class="input input-bordered w-full bg-white/20 text-white placeholder-gray-300 border-white/30" required>
-                        <input type="password" x-model="loginForm.password" placeholder="Password" class="input input-bordered w-full bg-white/20 text-white placeholder-gray-300 border-white/30" required>
-                        <button type="submit" class="btn btn-block bg-dwali-yellow text-dwali-dark border-none hover:bg-yellow-400" :disabled="loading">
-                            <span x-show="!loading">Masuk</span>
-                            <span x-show="loading" class="spinner"></span>
-                        </button>
-                        <button type="button" @click="view='login'" class="text-xs text-dwali-light hover:underline w-full">&larr; Kembali</button>
-                    </form>
-                    <div class="mt-4 text-xs text-dwali-light/70 text-center">
-                        <p class="font-bold text-dwali-yellow">📝 Contoh Akun:</p>
-                        <p>Ahmad Fauzi, Budi Santoso, Citra Dewi, dll</p>
-                        <p>Kelas: 7A | Password: siswa123</p>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- ADMIN LOGIN -->
-        <template x-if="view === 'admin-login'">
-            <div class="flex items-center justify-center min-h-[80vh]">
-                <div class="glass p-8 rounded-3xl w-full max-w-md shadow-2xl">
-                    <h2 class="text-2xl font-bold mb-4 text-center">Login Wali Kelas</h2>
-                    <form @submit.prevent="adminLogin()" class="space-y-4">
-                        <input type="email" x-model="loginForm.email" placeholder="Email Wali" class="input input-bordered w-full bg-white/20 text-white placeholder-gray-300 border-white/30" required>
-                        <input type="password" x-model="loginForm.password" placeholder="Password" class="input input-bordered w-full bg-white/20 text-white placeholder-gray-300 border-white/30" required>
-                        <button type="submit" class="btn btn-block bg-dwali-yellow text-dwali-dark border-none hover:bg-yellow-400" :disabled="loading">
-                            <span x-show="!loading">Masuk</span>
-                            <span x-show="loading" class="spinner"></span>
-                        </button>
-                        <button type="button" @click="view='login'" class="text-xs text-dwali-light hover:underline w-full">&larr; Kembali</button>
-                    </form>
-                    <div class="mt-4 text-xs text-dwali-light/70 text-center">
-                        <p class="font-bold text-dwali-yellow">📝 Contoh Akun:</p>
-                        <p>Email: admin@dwali.com | Pass: admin123</p>
-                        <p>Email: wali@dwali.com | Pass: wali123</p>
-                    </div>
-                </div>
-            </div>
-        </template>
 
         <!-- STUDENT DASHBOARD -->
-        <template x-if="currentUser?.role === 'student' && view === 'student-dashboard'">
-            <div class="space-y-6">
-                <template x-if="!currentUser.is_potensi_filled">
-                    <div class="glass p-6 rounded-3xl shadow-xl max-w-2xl mx-auto">
-                        <h2 class="text-2xl font-bold mb-2">Peta Potensi Siswa 🗺️</h2>
-                        <p class="text-dwali-light mb-6">Lengkapi data berikut 1 kali saja. Ini akan membantu walimu memahamimu lebih baik.</p>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="label text-white">Minat</label>
-                                <select x-model="potensiForm.minat" class="select select-bordered w-full bg-white/20 border-white/30">
-                                    <option class="bg-dwali-dark" value="Olahraga">Olahraga</option>
-                                    <option class="bg-dwali-dark" value="Seni">Seni</option>
-                                    <option class="bg-dwali-dark" value="Sains">Sains</option>
-                                    <option class="bg-dwali-dark" value="Teknologi">Teknologi</option>
-                                    <option class="bg-dwali-dark" value="Bahasa">Bahasa</option>
-                                    <option class="bg-dwali-dark" value="Lainnya">Lainnya</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="label text-white">Gaya Belajar</label>
-                                <select x-model="potensiForm.gaya_belajar" class="select select-bordered w-full bg-white/20 border-white/30">
-                                    <option class="bg-dwali-dark" value="Visual">Visual</option>
-                                    <option class="bg-dwali-dark" value="Auditori">Auditori</option>
-                                    <option class="bg-dwali-dark" value="Kinestetik">Kinestetik</option>
-                                    <option class="bg-dwali-dark" value="Baca/Tulis">Baca/Tulis</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="label text-white">Cita-cita</label>
-                                <textarea x-model="potensiForm.cita_cita" class="textarea textarea-bordered w-full bg-white/20 border-white/30" placeholder="Aku ingin menjadi..."></textarea>
-                            </div>
-                            <div>
-                                <label class="label text-white">Kekuatan Karakter</label>
-                                <select x-model="potensiForm.kekuatan_karakter" class="select select-bordered w-full bg-white/20 border-white/30">
-                                    <option class="bg-dwali-dark" value="Pemberani">Pemberani</option>
-                                    <option class="bg-dwali-dark" value="Baik Hati">Baik Hati</option>
-                                    <option class="bg-dwali-dark" value="Kreatif">Kreatif</option>
-                                    <option class="bg-dwali-dark" value="Pantang Menyerah">Pantang Menyerah</option>
-                                    <option class="bg-dwali-dark" value="Disiplin">Disiplin</option>
-                                    <option class="bg-dwali-dark" value="Pemimpin">Pemimpin</option>
-                                    <option class="bg-dwali-dark" value="Jujur">Jujur</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="label text-white">Ekstrakurikuler</label>
-                                <input type="text" x-model="potensiForm.ekstrakurikuler" class="input input-bordered w-full bg-white/20 border-white/30" placeholder="cth: Pramuka, Futsal">
-                            </div>
-                            <button @click="savePotensi()" class="btn btn-block bg-dwali-success text-white border-none hover:bg-green-600 mt-4" :disabled="loading">
-                                <span x-show="!loading">Simpan Peta Potensi</span>
-                                <span x-show="loading" class="spinner"></span>
-                            </button>
-                        </div>
-                    </div>
-                </template>
-
-                <template x-if="currentUser.is_potensi_filled">
-                    <div>
-                        <div class="glass p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center">
-                            <div>
-                                <h2 class="text-2xl font-bold">Halo, <span x-text="currentUser.name"></span>! 👋</h2>
-                                <p class="text-dwali-light">Kelas <span x-text="currentUser.class"></span></p>
-                            </div>
-                            <div class="mt-4 md:mt-0 text-center glass-dark p-3 rounded-xl">
-                                <p class="text-xs text-dwali-light">Status Peta Potensi</p>
-                                <p class="font-bold text-dwali-success">✅ Sudah Diisi</p>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-4 mt-6">
-                            <div @click="openGoodAction()" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center">
-                                <div class="text-5xl mb-2">⭐</div>
-                                <p class="font-bold">Perbuatan Baik</p>
-                                <p class="text-xs text-dwali-light" x-text="hasDoneGoodToday() ? '✔️ Sudah isi hari ini' : 'Klik untuk isi'"></p>
-                            </div>
-
-                            <div @click="navigateTo('student-jurnal')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center">
-                                <div class="text-5xl mb-2">📔</div>
-                                <p class="font-bold">Jurnal Harian</p>
-                                <p class="text-xs text-dwali-light">Ceritakan harimu</p>
-                            </div>
-
-                            <div @click="navigateTo('student-curhat')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center col-span-2">
-                                <div class="text-5xl mb-2">💬</div>
-                                <p class="font-bold">Kontak Curhat</p>
-                                <p class="text-xs text-dwali-light">Ada keluhan atau cerita? Sampaikan ke walimu.</p>
-                            </div>
-
-                            <div @click="navigateTo('student-riwayat')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center col-span-2">
-                                <div class="text-5xl mb-2">📬</div>
-                                <p class="font-bold">Riwayat Curhatku</p>
-                                <p class="text-xs text-dwali-light">Cek balasan dari wali</p>
-                            </div>
-                        </div>
-                    </div>
-                </template>
+        <div x-show="studentView==='dashboard'" class="min-h-screen p-6">
+            <div class="flex justify-between items-center mb-6">
+                <div>
+                    <p class="text-green-100 text-sm">Selamat datang,</p>
+                    <h1 class="text-2xl font-bold" x-text="currentUser.name"></h1>
+                </div>
+                <button @click="logout()" class="glass-dark p-2 rounded-full text-xs">Keluar</button>
             </div>
-        </template>
 
-        <!-- MODAL: PERBUATAN BAIK -->
-        <template x-if="modalGoodAction">
-            <div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" @click.self="modalGoodAction=false">
-                <div class="glass-dark p-6 rounded-3xl w-full max-w-md">
-                    <h3 class="text-xl font-bold mb-4 text-center">Pilih Perbuatan Baikmu 🌟</h3>
-                    <div class="space-y-2">
-                        <template x-for="act in goodActions">
-                            <button @click="submitGoodAction(act)" class="btn btn-block glass text-white hover:bg-dwali-green border-none justify-start text-left" :disabled="loading">
-                                <span x-text="act"></span>
-                            </button>
-                        </template>
-                    </div>
+            <div class="grid grid-cols-2 gap-4">
+                <!-- Perbuatan Baik -->
+                <div class="col-span-2 glass rounded-3xl p-6 text-center">
+                    <h3 class="font-bold text-lg mb-3">Perbuatan Baik Hari Ini</h3>
+                    <template x-if="!currentUser.perbuatan_baik_today">
+                        <button @click="openModal('perbuatanBaik')" class="bg-yellow-400 text-green-900 text-5xl w-20 h-20 rounded-full mx-auto flex items-center justify-center shadow-lg">⭐</button>
+                    </template>
+                    <template x-if="currentUser.perbuatan_baik_today">
+                        <div class="text-green-300 font-bold py-4">✔️ Sudah Berbuat Baik Hari Ini!</div>
+                    </template>
                 </div>
+
+                <button @click="openModal('curhat')" class="glass rounded-3xl p-6 text-center hover:scale-105 transition">
+                    <div class="text-4xl mb-2">💬</div>
+                    <div class="font-semibold">Kontak Curhat</div>
+                </button>
+
+                <button @click="openModal('jurnal')" class="glass rounded-3xl p-6 text-center hover:scale-105 transition">
+                    <div class="text-4xl mb-2">📔</div>
+                    <div class="font-semibold">Jurnal Harian</div>
+                </button>
+
+                <button @click="studentView='riwayat'" class="col-span-2 glass rounded-3xl p-6 text-center flex items-center justify-between hover:scale-[1.02] transition">
+                    <div class="text-left">
+                        <div class="font-semibold text-lg">Riwayat Curhatku</div>
+                        <div class="text-xs text-green-100">Lihat balasan dari wali</div>
+                    </div>
+                    <div class="text-4xl">📨</div>
+                </button>
             </div>
-        </template>
-
-        <!-- STUDENT: JURNAL HARIAN -->
-        <template x-if="view === 'student-jurnal'">
-            <div class="space-y-4">
-                <button @click="goBack()" class="text-dwali-light hover:underline">&larr; Kembali ke Dashboard</button>
-                <div class="glass p-6 rounded-3xl">
-                    <h2 class="text-2xl font-bold mb-4">Jurnal Harian 📔</h2>
-                    
-                    <label class="label text-white">Bagaimana perasaanmu hari ini?</label>
-                    <div class="flex gap-2 mb-4 text-4xl">
-                        <template x-for="m in ['😊', '😐', '😢', '😡', '😴']">
-                            <button @click="jurnalForm.perasaan = m" :class="jurnalForm.perasaan === m ? 'bg-dwali-yellow scale-110' : 'bg-white/20'" class="p-2 rounded-xl transition-transform">
-                                <span x-text="m"></span>
-                            </button>
-                        </template>
-                    </div>
-
-                    <label class="label text-white">Ceritakan harimu...</label>
-                    <textarea x-model="jurnalForm.cerita" class="textarea textarea-bordered w-full bg-white/20 border-white/30 mb-4" rows="4"></textarea>
-
-                    <button @click="saveJurnal()" class="btn btn-block bg-dwali-success text-white border-none" :disabled="loading">
-                        <span x-show="!loading">Simpan Jurnal</span>
-                        <span x-show="loading" class="spinner"></span>
-                    </button>
-                </div>
-
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="font-bold mb-3">Riwayat Jurnal</h3>
-                    <div class="space-y-3 max-h-96 overflow-y-auto">
-                        <template x-for="jrn in getMyJurnals()">
-                            <div class="bg-white/10 p-3 rounded-xl">
-                                <div class="flex justify-between text-xs text-dwali-light mb-1">
-                                    <span x-text="formatDate(jrn.date)"></span>
-                                    <span x-text="jrn.perasaan"></span>
-                                </div>
-                                <p x-text="jrn.cerita" class="text-sm"></p>
-                            </div>
-                        </template>
-                        <div x-show="getMyJurnals().length === 0" class="text-center text-dwali-light py-4">Belum ada jurnal.</div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- STUDENT: CURHAT -->
-        <template x-if="view === 'student-curhat'">
-            <div class="space-y-4">
-                <button @click="goBack(); resetCurhatForm()" class="text-dwali-light hover:underline">&larr; Kembali ke Dashboard</button>
-                <div class="glass p-6 rounded-3xl min-h-[60vh] flex flex-col">
-                    <h2 class="text-xl font-bold mb-4 text-center">Kontak Curhat 💬</h2>
-                    
-                    <div class="flex-1 space-y-3 overflow-y-auto mb-4">
-                        <div class="chat chat-start">
-                            <div class="chat-bubble-bot chat-bubble">Halo, aku di sini untuk mendengarkan. Siapakah kamu?</div>
-                        </div>
-                        
-                        <template x-if="curhatForm.untuk_siapa">
-                            <div class="chat chat-end">
-                                <div class="chat-bubble-user chat-bubble" x-text="curhatForm.untuk_siapa"></div>
-                            </div>
-                        </template>
-                        <template x-if="curhatForm.untuk_siapa && !curhatForm.kategori">
-                            <div class="chat chat-start"><div class="chat-bubble-bot chat-bubble">Kategori, apakah ini masalah di rumah atau di sekolah?</div></div>
-                        </template>
-
-                        <template x-if="curhatForm.kategori">
-                            <div class="chat chat-end"><div class="chat-bubble-user chat-bubble" x-text="curhatForm.kategori"></div></div>
-                        </template>
-                        <template x-if="curhatForm.kategori && !curhatForm.sub_kategori">
-                            <div class="chat chat-start"><div class="chat-bubble-bot chat-bubble" x-text="curhatForm.kategori === 'Rumah' ? 'Masalah di rumah?' : 'Masalah di sekolah?'"></div></div>
-                        </template>
-
-                        <template x-if="curhatForm.sub_kategori">
-                            <div class="chat chat-end"><div class="chat-bubble-user chat-bubble" x-text="curhatForm.sub_kategori"></div></div>
-                        </template>
-                        <template x-if="curhatForm.sub_kategori && !curhatForm.tingkat_darurat">
-                            <div class="chat chat-start"><div class="chat-bubble-bot chat-bubble">Tingkat Darurat?</div></div>
-                        </template>
-
-                        <template x-if="curhatForm.tingkat_darurat">
-                            <div class="chat chat-end"><div class="chat-bubble-user chat-bubble" x-text="curhatForm.tingkat_darurat"></div></div>
-                        </template>
-                        <template x-if="curhatForm.tingkat_darurat && !curhatForm.cerita">
-                            <div class="chat chat-start"><div class="chat-bubble-bot chat-bubble">Masalahnya apa? Ceritakan bebas ya.</div></div>
-                        </template>
-                        
-                        <template x-if="curhatForm.tingkat_darurat === 'Aku butuh bantuan sekarang'">
-                            <div class="chat chat-start">
-                                <div class="chat-bubble bg-dwali-red/80 chat-bubble">⚠️ Kami akan segera menghubungimu! Tetap tenang ya.</div>
-                            </div>
-                        </template>
-                    </div>
-
-                    <div class="border-t border-white/20 pt-4">
-                        <template x-if="!curhatForm.untuk_siapa">
-                            <div class="flex gap-2 justify-center flex-wrap">
-                                <button @click="setCurhat('untuk_siapa', 'Aku sendiri')" class="btn btn-sm bg-dwali-yellow text-dwali-dark">Aku sendiri</button>
-                                <button @click="setCurhat('untuk_siapa', 'Aku curhat untuk temanku')" class="btn btn-sm bg-dwali-light text-dwali-dark">Curhat untuk temanku</button>
-                            </div>
-                        </template>
-
-                        <template x-if="curhatForm.untuk_siapa && !curhatForm.kategori">
-                            <div class="flex gap-2 justify-center">
-                                <button @click="setCurhat('kategori', 'Rumah')" class="btn btn-sm bg-dwali-yellow text-dwali-dark">Rumah</button>
-                                <button @click="setCurhat('kategori', 'Sekolah')" class="btn btn-sm bg-dwali-light text-dwali-dark">Sekolah</button>
-                            </div>
-                        </template>
-
-                        <template x-if="curhatForm.kategori === 'Rumah' && !curhatForm.sub_kategori">
-                            <div class="flex gap-2 justify-center flex-wrap">
-                                <button @click="setCurhat('sub_kategori', 'Orang tua')" class="btn btn-sm glass text-white">Orang tua</button>
-                                <button @click="setCurhat('sub_kategori', 'Saudara')" class="btn btn-sm glass text-white">Saudara</button>
-                                <button @click="setCurhat('sub_kategori', 'Keuangan')" class="btn btn-sm glass text-white">Keuangan</button>
-                                <button @click="setCurhat('sub_kategori', 'Lainnya')" class="btn btn-sm glass text-white">Lainnya</button>
-                            </div>
-                        </template>
-
-                        <template x-if="curhatForm.kategori === 'Sekolah' && !curhatForm.sub_kategori">
-                            <div class="flex gap-2 justify-center flex-wrap">
-                                <button @click="setCurhat('sub_kategori', 'Perundungan')" class="btn btn-sm glass text-white">Perundungan</button>
-                                <button @click="setCurhat('sub_kategori', 'Pelajaran')" class="btn btn-sm glass text-white">Pelajaran</button>
-                                <button @click="setCurhat('sub_kategori', 'Teman')" class="btn btn-sm glass text-white">Teman</button>
-                                <button @click="setCurhat('sub_kategori', 'Guru')" class="btn btn-sm glass text-white">Guru</button>
-                                <button @click="setCurhat('sub_kategori', 'Lainnya')" class="btn btn-sm glass text-white">Lainnya</button>
-                            </div>
-                        </template>
-
-                        <template x-if="curhatForm.sub_kategori && !curhatForm.tingkat_darurat">
-                            <div class="flex gap-2 justify-center flex-wrap">
-                                <button @click="setCurhat('tingkat_darurat', 'Aku cuma mau cerita')" class="btn btn-sm bg-dwali-success text-white">Cuma mau cerita</button>
-                                <button @click="setCurhat('tingkat_darurat', 'Aku butuh saran')" class="btn btn-sm bg-dwali-yellow text-dwali-dark">Butuh saran</button>
-                                <button @click="setCurhat('tingkat_darurat', 'Aku butuh bantuan sekarang')" class="btn btn-sm bg-dwali-red text-white">Butuh bantuan sekarang!</button>
-                            </div>
-                        </template>
-
-                        <template x-if="curhatForm.tingkat_darurat && !curhatForm.cerita">
-                            <div class="space-y-2">
-                                <textarea x-model="tempCerita" class="textarea textarea-bordered w-full bg-white/20 border-white/30" rows="3" placeholder="Tulis cerita disini..."></textarea>
-                                <button @click="submitCerita()" class="btn btn-block bg-dwali-success text-white border-none" :disabled="loading">
-                                    <span x-show="!loading">Kirim Curhatan</span>
-                                    <span x-show="loading" class="spinner"></span>
-                                </button>
-                            </div>
-                        </template>
-                        
-                        <template x-if="curhatForm.cerita">
-                            <div class="text-center text-dwali-success font-bold">✅ Terima kasih sudah curhat, sabar ya menunggu balasan dari Wali.</div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- STUDENT: RIWAYAT CURHAT -->
-        <template x-if="view === 'student-riwayat'">
-            <div class="space-y-4">
-                <button @click="goBack()" class="text-dwali-light hover:underline">&larr; Kembali ke Dashboard</button>
-                <div class="glass p-6 rounded-3xl">
-                    <h2 class="text-2xl font-bold mb-4">Riwayat Curhatku 📬</h2>
-                    <div class="space-y-3">
-                        <template x-for="ch in getMyCurhats()">
-                            <div class="bg-white/10 p-4 rounded-xl">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs text-dwali-light" x-text="formatDate(ch.created_at)"></span>
-                                    <span :class="ch.balasan ? 'bg-dwali-success/50' : 'bg-dwali-yellow/50'" class="px-2 py-1 rounded-full text-xs font-bold" x-text="ch.balasan ? 'Sudah Dibalas' : 'Menunggu Balasan'"></span>
-                                </div>
-                                <p class="text-sm mb-2 opacity-80" x-text="ch.cerita"></p>
-                                <div x-show="ch.balasan" class="mt-2 bg-dwali-dark/50 p-3 rounded-lg border-l-4 border-dwali-yellow">
-                                    <p class="text-xs font-bold text-dwali-yellow">Balasan Wali:</p>
-                                    <p class="text-sm" x-text="ch.balasan"></p>
-                                </div>
-                            </div>
-                        </template>
-                        <div x-show="getMyCurhats().length === 0" class="text-center text-dwali-light py-4">Belum ada riwayat curhat.</div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- ADMIN DASHBOARD -->
-        <template x-if="currentUser?.role === 'admin' && view === 'admin-dashboard'">
-            <div class="space-y-6">
-                <div class="glass p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold">Dashboard Wali Kelas</h2>
-                        <p class="text-dwali-light">Total Siswa: <span x-text="getMyStudents().length"></span></p>
-                    </div>
-                    <div class="flex gap-2 mt-4 md:mt-0 flex-wrap">
-                        <button @click="navigateTo('admin-curhat')" class="btn bg-dwali-yellow text-dwali-dark border-none">💬 Kotak Curhat</button>
-                        <button @click="navigateTo('admin-laporan')" class="btn bg-dwali-light text-dwali-dark border-none">📊 Buat Laporan</button>
-                        <button @click="navigateTo('admin-siswa')" class="btn glass text-white border-none">👥 Kelola Siswa</button>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="glass p-4 rounded-2xl flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-dwali-red"></div>
-                        <div>
-                            <p class="text-2xl font-bold" x-text="countCurhatByStatus('emergency')"></p>
-                            <p class="text-xs text-dwali-light">Belum Dibalas - Darurat</p>
-                        </div>
-                    </div>
-                    <div class="glass p-4 rounded-2xl flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-dwali-yellow"></div>
-                        <div>
-                            <p class="text-2xl font-bold" x-text="countCurhatByStatus('normal')"></p>
-                            <p class="text-xs text-dwali-light">Belum Dibalas - Biasa</p>
-                        </div>
-                    </div>
-                    <div class="glass p-4 rounded-2xl flex items-center gap-4">
-                        <div class="w-4 h-4 rounded-full bg-dwali-success"></div>
-                        <div>
-                            <p class="text-2xl font-bold" x-text="getMyStudents().length"></p>
-                            <p class="text-xs text-dwali-light">Total Siswa</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass p-6 rounded-3xl">
-                    <h3 class="font-bold mb-4">Daftar Siswa</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <template x-for="std in getMyStudents()">
-                            <div class="bg-white/10 p-4 rounded-xl flex items-center justify-between">
-                                <div class="flex items-center gap-3">
-                                    <div class="w-3 h-3 rounded-full" :class="getStudentStatusColor(std.id)"></div>
-                                    <div>
-                                        <p class="font-bold" x-text="std.name"></p>
-                                        <p class="text-xs text-dwali-light" x-text="std.nis"></p>
-                                    </div>
-                                </div>
-                                <button @click="navigateTo('admin-curhat')" class="btn btn-xs glass text-white">Detail</button>
-                            </div>
-                        </template>
-                        <div x-show="getMyStudents().length === 0" class="text-center text-dwali-light py-4 col-span-2">Belum ada siswa. Tambahkan di menu Kelola Siswa.</div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- ADMIN: KELOLA SISWA -->
-        <template x-if="view === 'admin-siswa'">
-            <div class="space-y-4">
-                <button @click="goBack()" class="text-dwali-light hover:underline">&larr; Kembali ke Dashboard</button>
-                <div class="glass p-6 rounded-3xl">
-                    <h2 class="text-2xl font-bold mb-4">Kelola Siswa 👥</h2>
-                    
-                    <div class="flex gap-2 mb-6 flex-wrap">
-                        <input type="text" x-model="newStudent.name" placeholder="Nama Siswa" class="input input-bordered flex-1 min-w-[150px] bg-white/20 border-white/30">
-                        <input type="text" x-model="newStudent.nis" placeholder="NIS" class="input input-bordered w-32 bg-white/20 border-white/30">
-                        <button @click="addStudent()" class="btn bg-dwali-success text-white border-none" :disabled="loading">
-                            <span x-show="!loading">Tambah</span>
-                            <span x-show="loading" class="spinner"></span>
-                        </button>
-                    </div>
-
-                    <div class="space-y-2">
-                        <template x-for="std in getMyStudents()">
-                            <div class="bg-white/10 p-3 rounded-xl flex justify-between items-center flex-wrap gap-2">
-                                <div>
-                                    <p class="font-bold" x-text="std.name"></p>
-                                    <p class="text-xs text-dwali-light">NIS: <span x-text="std.nis"></span></p>
-                                </div>
-                                <div class="flex gap-2">
-                                    <button @click="resetPassword(std.id)" class="btn btn-xs btn-warning text-white">Reset Pass</button>
-                                    <button @click="deleteStudent(std.id)" class="btn btn-xs btn-error text-white">Hapus</button>
-                                </div>
-                            </div>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- ADMIN: CURHAT INBOX -->
-        <template x-if="view === 'admin-curhat'">
-            <div class="space-y-4">
-                <button @click="goBack()" class="text-dwali-light hover:underline">&larr; Kembali ke Dashboard</button>
-                <div class="glass p-6 rounded-3xl">
-                    <h2 class="text-2xl font-bold mb-4">Kotak Curhat Masuk 💬</h2>
-                    <div class="space-y-4">
-                        <template x-for="ch in getAdminCurhats()">
-                            <div class="bg-white/10 p-4 rounded-xl border-l-4" :class="ch.tingkat_darurat === 'Aku butuh bantuan sekarang' ? 'border-dwali-red' : (ch.tingkat_darurat === 'Aku butuh saran' ? 'border-dwali-yellow' : 'border-dwali-success')">
-                                <div class="flex justify-between items-start mb-2 flex-wrap gap-2">
-                                    <div>
-                                        <p class="font-bold" x-text="getStudentName(ch.student_id)"></p>
-                                        <p class="text-xs text-dwali-light" x-text="formatDate(ch.created_at)"></p>
-                                    </div>
-                                    <span class="text-xs px-2 py-1 rounded-full" :class="ch.tingkat_darurat === 'Aku butuh bantuan sekarang' ? 'bg-dwali-red' : (ch.tingkat_darurat === 'Aku butuh saran' ? 'bg-dwali-yellow text-dwali-dark' : 'bg-dwali-success')" x-text="ch.tingkat_darurat"></span>
-                                </div>
-                                <div class="text-sm mb-3 opacity-90">
-                                    <p><span class="font-bold">Kategori:</span> <span x-text="ch.kategori"></span> - <span x-text="ch.sub_kategori"></span></p>
-                                    <p class="mt-1 p-2 bg-black/20 rounded"><span class="font-bold">Cerita:</span> <span x-text="ch.cerita"></span></p>
-                                </div>
-                                
-                                <div x-show="ch.balasan" class="bg-dwali-dark/50 p-3 rounded-lg mt-2">
-                                    <p class="text-xs font-bold text-dwali-yellow">Balasan Kamu:</p>
-                                    <p class="text-sm" x-text="ch.balasan"></p>
-                                </div>
-
-                                <div x-show="!ch.balasan" class="mt-3 flex gap-2 flex-wrap">
-                                    <input type="text" x-model="replyText[ch.id]" placeholder="Tulis balasan..." class="input input-bordered flex-1 min-w-[150px] bg-white/20 border-white/30 input-sm">
-                                    <button @click="replyCurhat(ch.id)" class="btn btn-sm bg-dwali-yellow text-dwali-dark border-none" :disabled="loading">
-                                        <span x-show="!loading">Kirim Balasan</span>
-                                        <span x-show="loading" class="spinner"></span>
-                                    </button>
-                                </div>
-                            </div>
-                        </template>
-                        <div x-show="getAdminCurhats().length === 0" class="text-center text-dwali-light py-4">Tidak ada curhat masuk.</div>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-        <!-- ADMIN: LAPORAN -->
-        <template x-if="view === 'admin-laporan'">
-            <div class="space-y-4">
-                <button @click="goBack()" class="text-dwali-light hover:underline">&larr; Kembali ke Dashboard</button>
-                <div class="glass p-6 rounded-3xl">
-                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
-                        <h2 class="text-2xl font-bold">Laporan Kondisi Siswa 📊</h2>
-                        <button @click="exportExcel()" class="btn bg-dwali-success text-white border-none">📥 Download Excel</button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="table w-full">
-                            <thead>
-                                <tr class="text-dwali-light">
-                                    <th>Nama</th>
-                                    <th>Nilai</th>
-                                    <th>Sikap</th>
-                                    <th>Catatan</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <template x-for="std in getMyStudents()">
-                                    <tr>
-                                        <td class="font-bold" x-text="std.name"></td>
-                                        <td>
-                                            <input type="number" min="0" max="100" x-model="laporanForm[std.id].nilai_akademik" class="input input-bordered w-20 bg-white/20 border-white/30 input-sm">
-                                        </td>
-                                        <td>
-                                            <select x-model="laporanForm[std.id].sikap" class="select select-bordered bg-white/20 border-white/30 select-sm">
-                                                <option class="bg-dwali-dark" value="Sangat Baik">Sangat Baik</option>
-                                                <option class="bg-dwali-dark" value="Baik">Baik</option>
-                                                <option class="bg-dwali-dark" value="Cukup">Cukup</option>
-                                                <option class="bg-dwali-dark" value="Kurang">Kurang</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="text" x-model="laporanForm[std.id].catatan_khusus" class="input input-bordered w-full max-w-xs bg-white/20 border-white/30 input-sm">
-                                        </td>
-                                    </tr>
-                                </template>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </template>
-
-    </main>
-
-    <!-- TOAST -->
-    <div x-show="toast.show" x-transition class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
-        <div class="glass-dark text-white px-6 py-3 rounded-full shadow-lg border border-dwali-yellow">
-            <span x-text="toast.msg"></span>
         </div>
+
+        <!-- STUDENT RIWAYAT CURHAT -->
+        <div x-show="studentView==='riwayat'" class="min-h-screen p-6">
+            <button @click="studentView='dashboard'" class="mb-4 text-sm flex items-center gap-2"><- Kembali</button>
+            <h2 class="text-2xl font-bold mb-4">Riwayat Curhat</h2>
+            <div class="space-y-3">
+                <template x-for="c in curhats.filter(c => c.student_id === currentUser.id)" :key="c.id">
+                    <div class="glass rounded-2xl p-4">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs text-green-100" x-text="new Date(c.created_at).toLocaleDateString()"></span>
+                            <span :class="c.balasan ? 'bg-green-500' : 'bg-yellow-400 text-green-900'" class="text-xs px-2 py-1 rounded-full font-semibold" x-text="c.balasan ? 'Dibalas' : 'Menunggu'"></span>
+                        </div>
+                        <p class="text-sm mb-2" x-text="'"' + c.cerita + '"'"></p>
+                        <div x-show="c.balasan" class="bg-black/20 p-3 rounded-xl mt-2">
+                            <p class="text-xs text-yellow-300 font-bold mb-1">Balasan Wali:</p>
+                            <p class="text-sm" x-text="c.balasan"></p>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- MODAL PERBUATAN BAIK -->
+        <div x-show="activeModal==='perbuatanBaik'" x-transition class="fixed inset-0 z-50 bg-black/60 flex items-end justify-center" @click.self="activeModal=null">
+            <div class="glass w-full max-w-md rounded-t-3xl p-6">
+                <h3 class="text-xl font-bold mb-4 text-center">Apa yang kamu lakukan?</h3>
+                <div class="space-y-2">
+                    <template x-for="act in ['Aku membantu teman', 'Aku berbagi makanan', 'Aku menjaga kebersihan', 'Aku berkata jujur', 'Lainnya']">
+                        <button @click="savePerbuatanBaik(act)" class="w-full bg-white/20 hover:bg-yellow-400 hover:text-green-900 transition py-3 rounded-xl font-semibold" x-text="act"></button>
+                    </template>
+                </div>
+            </div>
+        </div>
+
+        <!-- MODAL JURNAL -->
+        <div x-show="activeModal==='jurnal'" x-transition class="fixed inset-0 z-50 bg-black/60 flex items-end justify-center" @click.self="activeModal=null">
+            <div class="glass w-full max-w-md rounded-t-3xl p-6">
+                <h3 class="text-xl font-bold mb-4 text-center">Jurnal Hari Ini</h3>
+                <label class="text-sm text-green-100">Bagaimana perasaanmu?</label>
+                <div class="flex justify-around my-4 text-4xl">
+                    <template x-for="e in ['😊','😐','😢','😡','😴']">
+                        <button @click="jurnalForm.perasaan = e" :class="jurnalForm.perasaan===e ? 'scale-125 bg-white/20 rounded-full p-2' : ''" x-text="e"></button>
+                    </template>
+                </div>
+                <textarea x-model="jurnalForm.cerita" class="w-full bg-white/20 rounded-xl p-3 text-white placeholder-green-100" rows="3" placeholder="Ceritakan harimu..."></textarea>
+                <button @click="saveJurnal()" class="w-full bg-green-600 mt-4 py-3 rounded-xl font-bold">Simpan Jurnal</button>
+            </div>
+        </div>
+
+        <!-- MODAL CURHAT (Chat Flow) -->
+        <div x-show="activeModal==='curhat'" x-transition class="fixed inset-0 z-50 bg-black/80 flex flex-col p-4">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-bold">Curhat Wali</h3>
+                <button @click="activeModal=null" class="text-red-400">Tutup</button>
+            </div>
+            <div class="flex-1 overflow-y-auto space-y-3 mb-4 scrollbar-hide">
+                <!-- Chat Bubble Dinamis -->
+                <template x-for="(msg, i) in curhatChat" :key="i">
+                    <div :class="msg.type === 'bot' ? 'text-left' : 'text-right'">
+                        <div :class="msg.type === 'bot' ? 'bg-white/20' : 'bg-yellow-400 text-green-900'" class="inline-block px-4 py-2 rounded-2xl max-w-[80%]" x-text="msg.text"></div>
+                    </div>
+                </template>
+                
+                <div x-show="curhatStep === 1" class="flex gap-2 justify-end">
+                    <button @click="answerCurhat('untuk', 'Aku sendiri')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Aku sendiri</button>
+                    <button @click="answerCurhat('untuk', 'Temanku')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Curhat teman</button>
+                </div>
+                <div x-show="curhatStep === 2" class="flex gap-2 justify-end">
+                    <button @click="answerCurhat('kategori', 'Rumah')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Rumah</button>
+                    <button @click="answerCurhat('kategori', 'Sekolah')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Sekolah</button>
+                </div>
+                <div x-show="curhatStep === 3 && curhatForm.kategori === 'Rumah'" class="flex flex-wrap gap-2 justify-end">
+                    <template x-for="s in ['Orang tua','Saudara','Keuangan','Lainnya']">
+                        <button @click="answerCurhat('sub', s)" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold" x-text="s"></button>
+                    </template>
+                </div>
+                <div x-show="curhatStep === 3 && curhatForm.kategori === 'Sekolah'" class="flex flex-wrap gap-2 justify-end">
+                    <template x-for="s in ['Perundungan','Pelajaran','Teman','Guru','Lainnya']">
+                        <button @click="answerCurhat('sub', s)" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold" x-text="s"></button>
+                    </template>
+                </div>
+                <div x-show="curhatStep === 4" class="flex gap-2 justify-end">
+                    <button @click="answerCurhat('darurat', 'Cerita')" class="bg-green-500 px-4 py-2 rounded-full text-sm font-semibold">Mau cerita</button>
+                    <button @click="answerCurhat('darurat', 'Saran')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Butuh saran</button>
+                    <button @click="answerCurhat('darurat', 'Bantuan')" class="bg-red-500 px-4 py-2 rounded-full text-sm font-semibold">Bantuan Sekarang!</button>
+                </div>
+                
+                <div x-show="curhatStep === 5" class="mt-4">
+                    <textarea x-model="curhatForm.cerita" class="w-full bg-white/20 rounded-xl p-3 text-white" rows="4" placeholder="Ceritakan masalahnya..."></textarea>
+                    <button @click="submitCurhat()" class="w-full bg-green-600 mt-2 py-3 rounded-xl font-bold">Kirim Curhat</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ADMIN VIEW -->
+    <div x-show="isLoggedIn && role==='admin'" class="w-full max-w-4xl pb-24 p-4 md:p-8">
+        
+        <!-- HEADER -->
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <p class="text-green-100 text-sm">Dashboard Wali Kelas</p>
+                <h1 class="text-2xl md:text-3xl font-bold" x-text="currentUser.name"></h1>
+            </div>
+            <button @click="logout()" class="glass-dark px-4 py-2 rounded-xl text-sm">Keluar</button>
+        </div>
+
+        <!-- TABS -->
+        <div class="flex gap-2 mb-6 glass-dark p-1 rounded-full overflow-x-auto scrollbar-hide">
+            <button @click="adminView='siswa'" :class="adminView==='siswa' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Daftar Siswa</button>
+            <button @click="adminView='curhat'" :class="adminView==='curhat' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Inbox Curhat</button>
+            <button @click="adminView='laporan'" :class="adminView==='laporan' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Laporan</button>
+            <button @click="adminView='kelola'" :class="adminView==='kelola' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Kelola Siswa</button>
+        </div>
+
+        <!-- VIEW DAFTAR SISWA -->
+        <div x-show="adminView==='siswa'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <template x-for="s in students" :key="s.id">
+                <div class="glass rounded-2xl p-4 flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-full bg-yellow-400 text-green-900 flex items-center justify-center font-bold text-xl" x-text="s.name.charAt(0)"></div>
+                    <div class="flex-1">
+                        <h3 class="font-bold" x-text="s.name"></h3>
+                        <p class="text-xs text-green-100" x-text="s.nis + ' - ' + s.class"></p>
+                    </div>
+                    <div class="text-2xl" x-text="getStudentStatus(s.id)"></div>
+                </div>
+            </template>
+        </div>
+
+        <!-- VIEW CURHAT INBOX -->
+        <div x-show="adminView==='curhat'" class="space-y-4">
+            <template x-for="c in curhats" :key="c.id">
+                <div class="glass rounded-2xl p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <h3 class="font-bold" x-text="getStudentName(c.student_id)"></h3>
+                            <p class="text-xs text-green-100" x-text="new Date(c.created_at).toLocaleString()"></p>
+                        </div>
+                        <span class="text-xs px-2 py-1 rounded-full font-semibold"
+                              :class="c.tingkat_darurat === 'Bantuan' ? 'bg-red-500' : (c.tingkat_darurat === 'Saran' ? 'bg-yellow-400 text-green-900' : 'bg-green-500')"
+                              x-text="c.tingkat_darurat"></span>
+                    </div>
+                    <div class="text-xs text-green-100 mb-2">Kategori: <span x-text="c.kategori + ' - ' + c.sub"></span></div>
+                    <p class="text-sm bg-black/20 p-3 rounded-xl mb-3" x-text="c.cerita"></p>
+                    
+                    <div x-show="!c.balasan">
+                        <textarea x-model="tempReply" class="w-full bg-white/20 rounded-xl p-2 text-sm mb-2" rows="2" placeholder="Tulis balasan..."></textarea>
+                        <button @click="replyCurhat(c.id)" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-lg text-sm font-bold">Kirim Balasan</button>
+                    </div>
+                    <div x-show="c.balasan" class="bg-green-500/30 p-3 rounded-xl">
+                        <p class="text-xs text-yellow-300 font-bold">Balasan Wali:</p>
+                        <p class="text-sm" x-text="c.balasan"></p>
+                    </div>
+                </div>
+            </template>
+        </div>
+
+        <!-- VIEW LAPORAN -->
+        <div x-show="adminView==='laporan'" class="glass rounded-2xl p-4 overflow-x-auto">
+            <div class="flex justify-between mb-4">
+                <h2 class="text-xl font-bold">Laporan Kondisi Siswa</h2>
+                <button @click="exportExcel()" class="bg-green-600 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">📥 Download Excel</button>
+            </div>
+            <table class="w-full text-sm min-w-[600px]">
+                <thead>
+                    <tr class="border-b border-white/20 text-left">
+                        <th class="p-2">Nama</th>
+                        <th class="p-2">Nilai</th>
+                        <th class="p-2">Sikap</th>
+                        <th class="p-2">Catatan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template x-for="s in students" :key="s.id">
+                        <tr class="border-b border-white/10">
+                            <td class="p-2" x-text="s.name"></td>
+                            <td class="p-2"><input type="number" x-model="s.nilai" class="w-16 bg-white/10 p-1 rounded"></td>
+                            <td class="p-2">
+                                <select x-model="s.sikap" class="bg-white/10 p-1 rounded">
+                                    <option class="text-black" value="Sangat Baik">Sangat Baik</option>
+                                    <option class="text-black" value="Baik">Baik</option>
+                                    <option class="text-black" value="Cukup">Cukup</option>
+                                    <option class="text-black" value="Kurang">Kurang</option>
+                                </select>
+                            </td>
+                            <td class="p-2"><input type="text" x-model="s.catatan" class="w-full bg-white/10 p-1 rounded"></td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- VIEW KELOLA SISWA -->
+        <div x-show="adminView==='kelola'" class="space-y-4">
+            <div class="glass rounded-2xl p-4">
+                <h3 class="font-bold mb-3">Tambah Siswa Baru</h3>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
+                    <input type="text" x-model="newStudent.name" placeholder="Nama" class="bg-white/20 p-2 rounded-lg">
+                    <input type="text" x-model="newStudent.nis" placeholder="NIS" class="bg-white/20 p-2 rounded-lg">
+                    <input type="text" x-model="newStudent.class" placeholder="Kelas" class="bg-white/20 p-2 rounded-lg">
+                    <button @click="addStudent()" class="bg-yellow-400 text-green-900 font-bold rounded-lg">Tambah</button>
+                </div>
+            </div>
+            <div class="space-y-2">
+                <template x-for="s in students" :key="s.id">
+                    <div class="glass rounded-xl p-3 flex justify-between items-center">
+                        <span x-text="s.name + ' (' + s.nis + ')'"></span>
+                        <div class="flex gap-2">
+                            <button @click="resetPass(s.id)" class="bg-yellow-400 text-green-900 text-xs px-3 py-1 rounded-lg">Reset PW</button>
+                            <button @click="deleteStudent(s.id)" class="bg-red-500 text-xs px-3 py-1 rounded-lg">Hapus</button>
+                        </div>
+                    </div>
+                </template>
+            </div>
+        </div>
+
     </div>
 
 </div>
 
 <script>
-// ============ KONFIGURASI ============
-// ⚠️ GANTI DENGAN URL DEPLOYMENT ASLI!
-const API_URL = 'https://script.google.com/macros/s/AKfycby3tP9jgosbYkm_Q-XuAb5-laG_iz0Wp3KpQbt8oEnORaguI9XnQYnkhy_UK-zEYlPJLg/exec';
-
-async function callAPI(action, data = {}) {
-    try {
-        const url = `${API_URL}?action=${action}&data=${encodeURIComponent(JSON.stringify(data))}`;
-        console.log('📤 Calling API:', action, data);
-        
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-            },
-            mode: 'cors' // ← PASTIKAN CORS ENABLED
-        });
-        
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const result = await response.json();
-        console.log('📥 API Response:', result);
-        
-        if (!result.success) {
-            throw new Error(result.error || 'Terjadi kesalahan');
-        }
-        return result.data;
-    } catch (error) {
-        console.error('❌ API Error:', error);
-        throw error;
-    }
-}
-
-function dwaliApp() {
+function dWaliApp() {
     return {
-        view: 'login',
+        // STATE
+        isLoggedIn: false,
+        role: 'student',
+        loginRole: 'student',
+        loginForm: { name: 'Budi', class: '7A', pin: '51sw@qu', email: 'wali@dwali.com', pass: 'd4Rm@app*' },
         currentUser: null,
-        loginForm: { name: '', class: '', email: '', password: '' },
-        loading: false,
-        loadingMessage: 'Memuat data...',
-        loadingProgress: 0,
         
-        viewHistory: [],
-        
-        cachedStudents: [],
-        cachedCurhats: [],
-        cachedJurnals: [],
-        cachedPotensi: [],
-        cachedPerbuatanBaik: [],
+        // VIEWS
+        studentView: 'dashboard',
+        adminView: 'siswa',
+        activeModal: null,
+        notif: { show: false, text: '' },
 
-        potensiForm: { minat: 'Olahraga', gaya_belajar: 'Visual', cita_cita: '', kekuatan_karakter: 'Pemberani', ekstrakurikuler: '' },
+        // DATA
+        students: [
+            { id: 's1', name: 'Budi', nis: '12345', class: '7A', is_potensi_filled: false, perbuatan_baik_today: false, nilai: 85, sikap: 'Baik', catatan: 'Aktif', potensi: {} },
+            { id: 's2', name: 'Siti', nis: '12346', class: '7A', is_potensi_filled: true, perbuatan_baik_today: true, nilai: 90, sikap: 'Sangat Baik', catatan: 'Rajin', potensi: {} }
+        ],
+        curhats: [
+            { id: 'c1', student_id: 's2', untuk: 'Aku sendiri', kategori: 'Sekolah', sub: 'Pelajaran', tingkat_darurat: 'Saran', cerita: 'Saya kesulitan matematika pak', is_read: false, balasan: 'Nanti saya bantu belajar sore ya.', created_at: new Date().toISOString() }
+        ],
+        
+        // FORMS
+        potensiForm: { minat: '', gaya: '', cita_cita: '', karakter: '', ekskul: '' },
         jurnalForm: { perasaan: '', cerita: '' },
-        curhatForm: { untuk_siapa: '', kategori: '', sub_kategori: '', tingkat_darurat: '', cerita: '' },
-        tempCerita: '',
-        modalGoodAction: false,
-        goodActions: ['Aku membantu teman', 'Aku berbagi makanan', 'Aku menjaga kebersihan', 'Aku berkata jujur', 'Lainnya (tulis sendiri)'],
-        newStudent: { name: '', nis: '' },
-        replyText: {},
-        laporanForm: {},
-        toast: { show: false, msg: '' },
+        newStudent: { name: '', nis: '', class: '' },
+        tempReply: '',
 
+        // CURHAT FLOW
+        curhatStep: 0,
+        curhatChat: [],
+        curhatForm: { untuk: '', kategori: '', sub: '', darurat: '', cerita: '' },
+
+        // SYNC CONFIG
+        SHEET_URL: 'https://script.google.com/macros/s/AKfycbyxwcKsxvvqEn4F8-kViRBvdve5CuAnnMmht25vv5EpuUhLlpGlU5cQwsAMIZKGt7LUGw/exec', // GANTI DENGAN URL KAMU
+        isSyncing: false,
+
+        // ============ INIT ============
         init() {
-            const savedUser = localStorage.getItem('dwali_user');
-            if (savedUser) {
-                try {
-                    this.currentUser = JSON.parse(savedUser);
-                    const defaultView = this.currentUser.role === 'admin' ? 'admin-dashboard' : 'student-dashboard';
-                    this.view = defaultView;
-                    this.viewHistory = [defaultView];
-                    this.loadData();
-                } catch(e) {
-                    localStorage.removeItem('dwali_user');
+            this.loadFromSheet();
+        },
+
+        // ============ SYNC FUNCTIONS ============
+        async loadFromSheet() {
+            try {
+                this.showNotif('⏳ Loading data...');
+                
+                const studentResponse = await fetch(this.SHEET_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getStudents' })
+                });
+                
+                const studentData = await studentResponse.json();
+                if (studentData.status === 'success' && studentData.data.length > 0) {
+                    this.students = studentData.data;
                 }
+                
+                const curhatResponse = await fetch(this.SHEET_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'getCurhats' })
+                });
+                
+                const curhatData = await curhatResponse.json();
+                if (curhatData.status === 'success') {
+                    this.curhats = curhatData.data || [];
+                }
+                
+                this.showNotif('✅ Data loaded from spreadsheet!');
+                
+            } catch(error) {
+                console.error('Load error:', error);
+                this.showNotif('⚠️ Gagal load data, pakai data lokal');
             }
         },
 
-        showToast(msg) {
-            this.toast.msg = msg;
-            this.toast.show = true;
-            setTimeout(() => this.toast.show = false, 3000);
+        async syncStudentToSheet(student) {
+            try {
+                const response = await fetch(this.SHEET_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'saveStudent',
+                        student: student
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    console.log('Student synced:', student.name);
+                }
+            } catch(error) {
+                console.error('Sync error:', error);
+            }
         },
 
-        navigateTo(view) {
-            if (this.view === view) return;
-            this.viewHistory.push(view);
-            this.view = view;
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        async syncCurhatToSheet(curhat) {
+            try {
+                const response = await fetch(this.SHEET_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'saveCurhat',
+                        curhat: curhat
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    console.log('Curhat synced');
+                }
+            } catch(error) {
+                console.error('Sync error:', error);
+            }
         },
 
-        goBack() {
-            if (this.viewHistory.length > 1) {
-                this.viewHistory.pop();
-                this.view = this.viewHistory[this.viewHistory.length - 1];
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+        async syncReplyToSheet(curhatId, balasan) {
+            try {
+                const response = await fetch(this.SHEET_URL, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'replyCurhat',
+                        curhatId: curhatId,
+                        balasan: balasan
+                    })
+                });
+                
+                const result = await response.json();
+                if (result.status === 'success') {
+                    console.log('Reply synced');
+                }
+            } catch(error) {
+                console.error('Sync error:', error);
+            }
+        },
+
+        async syncAllStudents() {
+            for (let student of this.students) {
+                await this.syncStudentToSheet(student);
+            }
+            this.showNotif('✅ Semua data tersinkronisasi!');
+        },
+
+        // ============ AUTH ============
+        loginStudent() {
+            if(this.loginForm.pin === '51sw@qu') {
+                let student = this.students.find(s => 
+                    s.name.toLowerCase() === this.loginForm.name.toLowerCase() && 
+                    s.class.toLowerCase() === this.loginForm.class.toLowerCase()
+                );
+                if(!student) {
+                    student = { 
+                        id: 's'+Date.now(), 
+                        name: this.loginForm.name, 
+                        nis: 'NEW', 
+                        class: this.loginForm.class, 
+                        is_potensi_filled: false, 
+                        perbuatan_baik_today: false, 
+                        nilai: 0, 
+                        sikap: 'Baik', 
+                        catatan: '',
+                        potensi: {}
+                    };
+                    this.students.push(student);
+                    this.syncStudentToSheet(student);
+                }
+                this.currentUser = student;
+                this.isLoggedIn = true;
+                this.role = 'student';
+                this.studentView = student.is_potensi_filled ? 'dashboard' : 'potensi';
             } else {
-                this.goToHome();
+                this.showNotif('PIN/Password salah!');
             }
         },
 
-        goToHome() {
-            if (!this.currentUser) {
-                this.view = 'login';
-                this.viewHistory = ['login'];
-                return;
-            }
-            const homeView = this.currentUser.role === 'admin' ? 'admin-dashboard' : 'student-dashboard';
-            this.view = homeView;
-            this.viewHistory = [homeView];
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        },
-
-        async withLoading(message, callback) {
-            this.loading = true;
-            this.loadingMessage = message || 'Memuat data...';
-            this.loadingProgress = 0;
-            
-            try {
-                const progressInterval = setInterval(() => {
-                    if (this.loadingProgress < 90) {
-                        this.loadingProgress += Math.random() * 15;
-                    }
-                }, 200);
-                
-                const result = await callback();
-                
-                clearInterval(progressInterval);
-                this.loadingProgress = 100;
-                await new Promise(resolve => setTimeout(resolve, 300));
-                return result;
-            } finally {
-                this.loading = false;
-                this.loadingProgress = 0;
-            }
-        },
-
-        async loadData() {
-            if (!this.currentUser) return;
-            await this.withLoading('Memuat data...', async () => {
-                if (this.currentUser.role === 'admin') {
-                    await this.loadStudents();
-                    await this.loadCurhats();
-                } else {
-                    await this.loadMyJurnals();
-                    await this.loadMyCurhats();
-                    await this.loadPotensi();
-                    await this.loadPerbuatanBaik();
-                }
-            });
-        },
-
-        // --- AUTH ---
-        async studentLogin() {
-            try {
-                await this.withLoading('Login sebagai siswa...', async () => {
-                    const result = await callAPI('loginStudent', {
-                        name: this.loginForm.name,
-                        class: this.loginForm.class,
-                        password: this.loginForm.password
-                    });
-                    
-                    console.log('🔐 Student login result:', result);
-                    
-                    if (!result || !result.id) {
-                        throw new Error('Data siswa tidak valid!');
-                    }
-                    
-                    this.currentUser = result;
-                    localStorage.setItem('dwali_user', JSON.stringify(result));
-                    const homeView = 'student-dashboard';
-                    this.view = homeView;
-                    this.viewHistory = [homeView];
-                    this.showToast('✅ Login berhasil!');
-                    await this.loadData();
-                });
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                alert('❌ ' + (error.message || 'Login gagal! Cek koneksi atau data Anda.'));
-            }
-        },
-
-        async adminLogin() {
-            try {
-                await this.withLoading('Login sebagai wali kelas...', async () => {
-                    const result = await callAPI('loginAdmin', {
-                        email: this.loginForm.email,
-                        password: this.loginForm.password
-                    });
-                    
-                    console.log('🔐 Admin login result:', result);
-                    
-                    if (!result || !result.id) {
-                        throw new Error('Data admin tidak valid!');
-                    }
-                    
-                    this.currentUser = result;
-                    localStorage.setItem('dwali_user', JSON.stringify(result));
-                    const homeView = 'admin-dashboard';
-                    this.view = homeView;
-                    this.viewHistory = [homeView];
-                    this.showToast('✅ Selamat datang, Wali!');
-                    await this.loadData();
-                });
-            } catch (error) {
-                console.error('❌ Login error:', error);
-                alert('❌ ' + (error.message || 'Login gagal! Cek koneksi atau data Anda.'));
+        loginAdmin() {
+            if(this.loginForm.pass === 'd4Rm@app*') {
+                this.currentUser = { name: 'Pak Wali 7A' };
+                this.isLoggedIn = true;
+                this.role = 'admin';
+            } else {
+                this.showNotif('Password Wali salah!');
             }
         },
 
         logout() {
-            if(!confirm('Yakin mau logout?')) return;
+            this.isLoggedIn = false;
             this.currentUser = null;
-            this.view = 'login';
-            this.viewHistory = ['login'];
-            this.loginForm = { name: '', class: '', email: '', password: '' };
-            localStorage.removeItem('dwali_user');
-            this.cachedStudents = [];
-            this.cachedCurhats = [];
-            this.cachedJurnals = [];
-            this.cachedPotensi = [];
-            this.cachedPerbuatanBaik = [];
-            this.laporanForm = {};
-            this.replyText = {};
-            this.showToast('👋 Sampai jumpa!');
         },
 
-        // --- PETA POTENSI ---
-        async savePotensi() {
-            if (!this.potensiForm.cita_cita.trim()) {
-                return alert('Cita-cita tidak boleh kosong!');
-            }
-            await this.withLoading('Menyimpan peta potensi...', async () => {
-                await callAPI('savePotensi', {
-                    student_id: this.currentUser.id,
-                    ...this.potensiForm
-                });
-                this.currentUser.is_potensi_filled = true;
-                localStorage.setItem('dwali_user', JSON.stringify(this.currentUser));
-                this.showToast('✅ Peta Potensi tersimpan! 🗺️');
-                await this.loadData();
-            });
+        // ============ STUDENT FEATURES ============
+        savePotensi() {
+            this.currentUser.is_potensi_filled = true;
+            this.currentUser.potensi = this.potensiForm;
+            let idx = this.students.findIndex(s => s.id === this.currentUser.id);
+            this.students[idx] = this.currentUser;
+            this.studentView = 'dashboard';
+            this.syncStudentToSheet(this.currentUser);
+            this.showNotif('✅ Peta Potensi Tersimpan!');
         },
 
-        async loadPotensi() {
-            try {
-                const result = await callAPI('getPotensi', {
-                    student_id: this.currentUser.id
-                });
-                this.cachedPotensi = result || [];
-            } catch (error) {
-                console.error('Error loading potensi:', error);
+        savePerbuatanBaik(act) {
+            this.currentUser.perbuatan_baik_today = true;
+            let idx = this.students.findIndex(s => s.id === this.currentUser.id);
+            this.students[idx] = this.currentUser;
+            this.activeModal = null;
+            this.syncStudentToSheet(this.currentUser);
+            const praises = ["🌟 Good Job! Kamu hebat!", "💪 Luar biasa! Pertahankan ya!", "😇 Kamu anak baik!"];
+            this.showNotif(praises[Math.floor(Math.random() * praises.length)]);
+        },
+
+        saveJurnal() {
+            this.activeModal = null;
+            this.jurnalForm = { perasaan: '', cerita: '' };
+            this.showNotif('✅ Jurnal Harian Tersimpan!');
+        },
+
+        // ============ CURHAT ============
+        openModal(type) {
+            this.activeModal = type;
+            if(type === 'curhat') {
+                this.curhatStep = 1;
+                this.curhatChat = [{ type: 'bot', text: 'Siapakah kamu?' }];
+                this.curhatForm = { untuk: '', kategori: '', sub: '', darurat: '', cerita: '' };
             }
         },
 
-        // --- PERBUATAN BAIK ---
-        openGoodAction() {
-            if (this.hasDoneGoodToday()) {
-                this.showToast('🌟 Kamu sudah mengisi perbuatan baik hari ini. Hebat!');
-                return;
-            }
-            this.modalGoodAction = true;
-        },
-
-        hasDoneGoodToday() {
-            const today = new Date().toISOString().split('T')[0];
-            return this.cachedPerbuatanBaik.some(p => p.student_id === this.currentUser.id && p.date === today);
-        },
-
-        async submitGoodAction(action) {
-            const today = new Date().toISOString().split('T')[0];
-            await this.withLoading('Menyimpan perbuatan baik...', async () => {
-                await callAPI('savePerbuatanBaik', {
-                    student_id: this.currentUser.id,
-                    action: action,
-                    date: today
-                });
-                this.modalGoodAction = false;
-                this.cachedPerbuatanBaik.push({ student_id: this.currentUser.id, action, date: today });
-                const responses = ['🌟 Good Job! Kamu hebat!', '💪 Luar biasa! Pertahankan ya!', '😇 Kamu anak baik!'];
-                this.showToast(responses[Math.floor(Math.random() * responses.length)]);
-                await this.loadPerbuatanBaik();
-            });
-        },
-
-        async loadPerbuatanBaik() {
-            try {
-                const result = await callAPI('getPerbuatanBaik', {
-                    student_id: this.currentUser.id
-                });
-                this.cachedPerbuatanBaik = result || [];
-            } catch (error) {
-                console.error('Error loading perbuatan baik:', error);
-            }
-        },
-
-        // --- CURHAT ---
-        setCurhat(field, value) {
+        answerCurhat(field, value) {
             this.curhatForm[field] = value;
-        },
-
-        resetCurhatForm() {
-            this.curhatForm = { untuk_siapa: '', kategori: '', sub_kategori: '', tingkat_darurat: '', cerita: '' };
-            this.tempCerita = '';
-        },
-
-        async submitCerita() {
-            if (!this.tempCerita.trim()) return alert('Cerita tidak boleh kosong');
-            this.curhatForm.cerita = this.tempCerita;
-            await this.withLoading('Mengirim curhatan...', async () => {
-                await callAPI('saveCurhat', {
-                    id: 'c' + Date.now(),
-                    student_id: this.currentUser.id,
-                    ...this.curhatForm,
-                    created_at: new Date().toISOString()
-                });
-                this.tempCerita = '';
-                this.showToast('✅ Terima kasih sudah curhat, sabar ya menunggu balasan dari Wali.');
-                await this.loadMyCurhats();
-                setTimeout(() => {
-                    this.goToHome();
-                    this.resetCurhatForm();
-                }, 3000);
-            });
-        },
-
-        getMyCurhats() {
-            return this.cachedCurhats
-                .filter(c => c.student_id === this.currentUser.id)
-                .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-        },
-
-        async loadMyCurhats() {
-            try {
-                const result = await callAPI('getCurhats', {
-                    student_id: this.currentUser.id
-                });
-                this.cachedCurhats = result || [];
-            } catch (error) {
-                console.error('Error loading curhats:', error);
+            this.curhatChat.push({ type: 'user', text: value });
+            
+            if(field === 'untuk') { 
+                this.curhatStep = 2; 
+                this.curhatChat.push({ type: 'bot', text: 'Kategori, apakah ini masalah di rumah atau di sekolah?' }); 
+            } else if(field === 'kategori') { 
+                this.curhatStep = 3; 
+                this.curhatChat.push({ type: 'bot', text: `Masalah di ${value}?` }); 
+            } else if(field === 'sub') { 
+                this.curhatStep = 4; 
+                this.curhatChat.push({ type: 'bot', text: 'Tingkat Darurat?' }); 
+            } else if(field === 'darurat') {
+                this.curhatStep = 5;
+                let msg = 'Masalahnya apa? Ceritakan bebas ya.';
+                if(value === 'Bantuan') msg = '⚠️ Kami akan segera menghubungimu! Tetap tenang ya. Tapi ceritakan dulu apa yang terjadi.';
+                this.curhatChat.push({ type: 'bot', text: msg });
             }
         },
 
-        // --- JURNAL ---
-        async saveJurnal() {
-            if (!this.jurnalForm.perasaan || !this.jurnalForm.cerita) {
-                return alert('Lengkapi perasaan dan cerita');
-            }
-            const today = new Date().toISOString().split('T')[0];
-            await this.withLoading('Menyimpan jurnal...', async () => {
-                await callAPI('saveJurnal', {
-                    student_id: this.currentUser.id,
-                    ...this.jurnalForm,
-                    date: today
-                });
-                this.jurnalForm = { perasaan: '', cerita: '' };
-                this.showToast('📔 Jurnal harian tersimpan!');
-                await this.loadMyJurnals();
-            });
+        submitCurhat() {
+            const newCurhat = {
+                id: 'c'+Date.now(),
+                student_id: this.currentUser.id,
+                ...this.curhatForm,
+                tingkat_darurat: this.curhatForm.darurat,
+                is_read: false,
+                balasan: null,
+                created_at: new Date().toISOString()
+            };
+            
+            this.curhats.unshift(newCurhat);
+            this.syncCurhatToSheet(newCurhat);
+            this.activeModal = null;
+            this.showNotif('✅ Terima kasih sudah curhat, sabar ya menunggu balasan dari Wali.');
         },
 
-        getMyJurnals() {
-            return this.cachedJurnals
-                .filter(j => j.student_id === this.currentUser.id)
-                .sort((a,b) => new Date(b.date) - new Date(a.date));
-        },
-
-        async loadMyJurnals() {
-            try {
-                const result = await callAPI('getJurnals', {
-                    student_id: this.currentUser.id
-                });
-                this.cachedJurnals = result || [];
-            } catch (error) {
-                console.error('Error loading jurnals:', error);
-            }
-        },
-
-        // --- ADMIN: SISWA ---
-        getMyStudents() {
-            if (!this.currentUser) return [];
-            return this.cachedStudents.filter(s => s.wali_id === this.currentUser.id);
-        },
-
-        async loadStudents() {
-            if (!this.currentUser) return;
-            try {
-                const result = await callAPI('getStudents', {
-                    wali_id: this.currentUser.id
-                });
-                this.cachedStudents = result || [];
-                this.initLaporanForm();
-            } catch (error) {
-                console.error('Error loading students:', error);
-            }
-        },
-
-        async addStudent() {
-            if (!this.newStudent.name || !this.newStudent.nis) {
-                return alert('Nama dan NIS wajib diisi');
-            }
-            if (!/^[0-9]+$/.test(this.newStudent.nis)) {
-                return alert('NIS harus berupa angka!');
-            }
-            if (this.cachedStudents.some(s => s.nis === this.newStudent.nis)) {
-                return alert('NIS sudah terdaftar!');
-            }
-            await this.withLoading('Menambahkan siswa...', async () => {
-                await callAPI('addStudent', {
-                    nis: this.newStudent.nis,
-                    name: this.newStudent.name,
-                    wali_id: this.currentUser.id,
-                    class: this.currentUser.class
-                });
-                this.newStudent = { name: '', nis: '' };
-                this.showToast('✅ Siswa berhasil ditambahkan!');
-                await this.loadStudents();
-            });
-        },
-
-        async resetPassword(id) {
-            if (!confirm('Reset password siswa ke default (siswa123)?')) return;
-            await this.withLoading('Merreset password...', async () => {
-                await callAPI('resetPassword', { student_id: id });
-                this.showToast('✅ Password direset!');
-            });
-        },
-
-        async deleteStudent(id) {
-            if (!confirm('Yakin hapus siswa ini?')) return;
-            await this.withLoading('Menghapus siswa...', async () => {
-                await callAPI('deleteStudent', { student_id: id });
-                this.showToast('✅ Siswa dihapus.');
-                await this.loadStudents();
-            });
-        },
-
-        getStudentStatusColor(id) {
-            const curhats = this.cachedCurhats.filter(c => c.student_id === id && !c.balasan);
-            if (curhats.some(c => c.tingkat_darurat === 'Aku butuh bantuan sekarang')) return 'bg-dwali-red';
-            if (curhats.length > 0) return 'bg-dwali-yellow';
-            return 'bg-dwali-success';
-        },
-
-        // --- ADMIN: CURHAT ---
-        getAdminCurhats() {
-            const myStudentIds = this.getMyStudents().map(s => s.id);
-            return this.cachedCurhats
-                .filter(c => myStudentIds.includes(c.student_id))
-                .sort((a,b) => new Date(b.created_at) - new Date(a.created_at));
-        },
-
-        async loadCurhats() {
-            if (!this.currentUser) return;
-            try {
-                const result = await callAPI('getCurhats', {
-                    wali_id: this.currentUser.id
-                });
-                this.cachedCurhats = result || [];
-                this.cachedCurhats.forEach(c => {
-                    if (!c.balasan && !this.replyText[c.id]) {
-                        this.replyText[c.id] = '';
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading curhats:', error);
-            }
+        // ============ ADMIN FEATURES ============
+        getStudentStatus(id) {
+            let c = this.curhats.find(c => c.student_id === id && !c.balasan);
+            if(!c) return '🟢';
+            return c.tingkat_darurat === 'Bantuan' ? '🔴' : '🟡';
         },
 
         getStudentName(id) {
-            const std = this.cachedStudents.find(s => s.id === id);
-            return std ? std.name : 'Unknown';
+            let s = this.students.find(s => s.id === id);
+            return s ? s.name : 'Unknown';
         },
 
-        async replyCurhat(curhatId) {
-            const reply = this.replyText[curhatId];
-            if (!reply || !reply.trim()) return alert('Balasan tidak boleh kosong');
-            await this.withLoading('Mengirim balasan...', async () => {
-                await callAPI('replyCurhat', {
-                    curhat_id: curhatId,
-                    balasan: reply.trim(),
-                    balasan_at: new Date().toISOString()
-                });
-                const curhat = this.cachedCurhats.find(c => c.id === curhatId);
-                if (curhat) {
-                    curhat.balasan = reply.trim();
-                    curhat.balasan_at = new Date().toISOString();
-                }
-                this.replyText[curhatId] = '';
-                this.showToast('✅ Balasan terkirim!');
-                await this.loadCurhats();
-            });
-        },
-
-        countCurhatByStatus(type) {
-            const curhats = this.getAdminCurhats().filter(c => !c.balasan);
-            if (type === 'emergency') {
-                return curhats.filter(c => c.tingkat_darurat === 'Aku butuh bantuan sekarang').length;
+        replyCurhat(id) {
+            let c = this.curhats.find(c => c.id === id);
+            if(c) {
+                c.balasan = this.tempReply;
+                this.syncReplyToSheet(id, this.tempReply);
+                this.tempReply = '';
+                this.showNotif('Balasan terkirim!');
             }
-            if (type === 'normal') {
-                return curhats.filter(c => c.tingkat_darurat !== 'Aku butuh bantuan sekarang').length;
+        },
+
+        addStudent() {
+            if(this.newStudent.name && this.newStudent.nis) {
+                const newStudent = {
+                    id: 's'+Date.now(),
+                    ...this.newStudent,
+                    is_potensi_filled: false,
+                    perbuatan_baik_today: false,
+                    nilai: 0,
+                    sikap: 'Baik',
+                    catatan: '',
+                    potensi: {}
+                };
+                
+                this.students.push(newStudent);
+                this.newStudent = { name: '', nis: '', class: '' };
+                this.syncStudentToSheet(newStudent);
+                this.showNotif('Siswa ditambahkan!');
             }
-            return 0;
         },
 
-        // --- ADMIN: LAPORAN ---
-        initLaporanForm() {
-            this.getMyStudents().forEach(std => {
-                if (!this.laporanForm[std.id]) {
-                    this.laporanForm[std.id] = { 
-                        nilai_akademik: 70, 
-                        sikap: 'Baik', 
-                        catatan_khusus: '' 
-                    };
-                }
-            });
+        resetPass(id) {
+            this.showNotif('Password siswa direset ke: 51sw@qu');
         },
 
+        deleteStudent(id) {
+            this.students = this.students.filter(s => s.id !== id);
+            this.syncAllStudents();
+            this.showNotif('Siswa dihapus.');
+        },
+
+        // ============ EXPORT EXCEL ============
         exportExcel() {
-            const data = [];
-            this.getMyStudents().forEach(std => {
-                const potensi = this.cachedPotensi.find(p => p.student_id === std.id) || {};
-                const baik = this.cachedPerbuatanBaik.filter(p => p.student_id === std.id).length;
-                const jurnal = this.cachedJurnals.filter(j => j.student_id === std.id).length;
-                const laporan = this.laporanForm[std.id] || {};
-
-                data.push({
-                    'NIS': std.nis,
-                    'Nama Siswa': std.name,
-                    'Kelas': std.class,
-                    'Minat': potensi.minat || '-',
-                    'Gaya Belajar': potensi.gaya_belajar || '-',
-                    'Cita-cita': potensi.cita_cita || '-',
-                    'Kekuatan Karakter': potensi.kekuatan_karakter || '-',
-                    'Ekstrakurikuler': potensi.ekstrakurikuler || '-',
-                    'Nilai Akademik': laporan.nilai_akademik || 0,
-                    'Sikap': laporan.sikap || '-',
-                    'Catatan Khusus': laporan.catatan_khusus || '-',
-                    'Total Perbuatan Baik': baik,
-                    'Total Jurnal': jurnal
-                });
+            let data = this.students.map(s => {
+                let jurnalCount = this.curhats.filter(c => c.student_id === s.id).length;
+                return {
+                    'Nama': s.name,
+                    'NIS': s.nis,
+                    'Kelas': s.class,
+                    'Nilai Akademik': s.nilai,
+                    'Sikap': s.sikap,
+                    'Catatan Khusus': s.catatan,
+                    'Jumlah Curhat': jurnalCount
+                }
             });
+            
+            let ws = XLSX.utils.json_to_sheet(data);
+            const colWidths = Object.keys(data[0]).map(key => ({ 
+                wch: Math.max(key.length, ...data.map(d => String(d[key]).length)) 
+            }));
+            ws['!cols'] = colWidths;
 
-            if (data.length === 0) {
-                return alert('Belum ada data siswa untuk diexport!');
-            }
-
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wsCols = Object.keys(data[0] || {a:1}).map(key => ({ wpx: 120 }));
-            ws['!cols'] = wsCols;
-
-            const wb = XLSX.utils.book_new();
+            let wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Laporan Siswa");
             XLSX.writeFile(wb, "Laporan_DWali.xlsx");
-            this.showToast('📥 Excel berhasil diunduh!');
         },
 
-        formatDate(dateStr) {
-            if (!dateStr) return '-';
-            try {
-                const d = new Date(dateStr);
-                return d.toLocaleDateString('id-ID', { 
-                    day: '2-digit', 
-                    month: 'short', 
-                    year: 'numeric', 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                });
-            } catch {
-                return dateStr;
-            }
+        // ============ HELPER ============
+        showNotif(text) {
+            this.notif.text = text;
+            this.notif.show = true;
+            setTimeout(() => { this.notif.show = false; }, 3000);
         }
     }
 }
 </script>
-
 </body>
 </html>

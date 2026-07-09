@@ -450,47 +450,49 @@ function dWaliApp() {
             } catch(e) { console.error('Load from sheet error:', e); }
         },
 
-        async syncStudentToSheet(student) {
-            try {
-                const data = {
-                    ...student,
-                    potensi: JSON.stringify(student.potensi || {}),
-                    perbuatan_baik_today: student.perbuatan_baik_today ? 'true' : 'false'
-                };
-                
-                await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'saveStudent', student: data })
-                });
-                console.log('✅ Student sync sent:', student.name);
-            } catch(e) { console.error('Sync student error:', e); }
-        },
+        // ============ SYNC FUNCTIONS (PERBAIKAN) ============
 
-        async syncCurhatToSheet(curhat) {
-            try {
-                await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'saveCurhat', curhat: curhat })
-                });
-                console.log('✅ Curhat sync sent');
-            } catch(e) { console.error('Sync curhat error:', e); }
-        },
+async syncStudentToSheet(student) {
+    try {
+        const data = {
+            ...student,
+            potensi: JSON.stringify(student.potensi || {}),
+            perbuatan_baik_today: student.perbuatan_baik_today ? 'true' : 'false'
+        };
+        
+        await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'syncStudent', student: data })  // <-- UBAH
+        });
+        console.log('✅ Student sync sent:', student.name);
+    } catch(e) { console.error('Sync student error:', e); }
+},
 
-        async syncReplyToSheet(curhatId, balasan) {
-            try {
-                await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'replyCurhat', curhatId, balasan })
-                });
-                console.log('✅ Reply sync sent');
-            } catch(e) { console.error('Sync reply error:', e); }
-        },
+async syncCurhatToSheet(curhat) {
+    try {
+        await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'syncCurhat', curhat: curhat })  // <-- UBAH
+        });
+        console.log('✅ Curhat sync sent');
+    } catch(e) { console.error('Sync curhat error:', e); }
+},
+
+async syncReplyToSheet(curhatId, balasan) {
+    try {
+        await fetch(this.SHEET_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'syncReply', curhatId, balasan })  // <-- UBAH
+        });
+        console.log('✅ Reply sync sent');
+    } catch(e) { console.error('Sync reply error:', e); }
+},
 
         // ============ AUTH ============
         loginStudent() {
@@ -593,7 +595,7 @@ function dWaliApp() {
                 method: 'POST',
                 mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'saveJurnal', jurnal })
+                body: JSON.stringify({ action: 'syncJurnal', jurnal })
             });
             
             this.showNotif('✅ Jurnal Tersimpan!');

@@ -73,7 +73,6 @@
         ::-webkit-scrollbar-track { background: rgba(255,255,255,0.1); }
         ::-webkit-scrollbar-thumb { background: #a7f3d0; border-radius: 10px; }
         
-        /* Loading Spinner */
         .spinner {
             border: 3px solid rgba(255,255,255,0.1);
             border-radius: 50%;
@@ -88,7 +87,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* Page Transition */
         .page-enter-active, .page-leave-active {
             transition: all 0.3s ease;
         }
@@ -145,7 +143,6 @@
                         <button @click="view='admin-login'" class="btn btn-block text-dwali-dark bg-dwali-yellow hover:bg-yellow-400 border-yellow-400">Login sebagai Wali Kelas</button>
                     </div>
                     
-                    <!-- Info Login -->
                     <div class="mt-6 text-xs text-dwali-light/70">
                         <p class="font-bold text-dwali-yellow">🔑 Akun Demo:</p>
                         <p>Siswa: Ahmad Fauzi | Kelas: 7A | Pass: siswa123</p>
@@ -202,102 +199,103 @@
             </div>
         </template>
 
-        <!-- ================= STUDENT VIEWS ================= -->
-
-        <!-- ONBOARDING: PETA POTENSI -->
-        <template x-if="currentUser?.role === 'student' && !currentUser.is_potensi_filled && view === 'student-dashboard'">
-            <div class="glass p-6 rounded-3xl shadow-xl max-w-2xl mx-auto">
-                <h2 class="text-2xl font-bold mb-2">Peta Potensi Siswa 🗺️</h2>
-                <p class="text-dwali-light mb-6">Lengkapi data berikut 1 kali saja. Ini akan membantu walimu memahamimu lebih baik.</p>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="label text-white">Minat</label>
-                        <select x-model="potensiForm.minat" class="select select-bordered w-full bg-white/20 border-white/30">
-                            <option class="bg-dwali-dark" value="Olahraga">Olahraga</option>
-                            <option class="bg-dwali-dark" value="Seni">Seni</option>
-                            <option class="bg-dwali-dark" value="Sains">Sains</option>
-                            <option class="bg-dwali-dark" value="Teknologi">Teknologi</option>
-                            <option class="bg-dwali-dark" value="Bahasa">Bahasa</option>
-                            <option class="bg-dwali-dark" value="Lainnya">Lainnya</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label text-white">Gaya Belajar</label>
-                        <select x-model="potensiForm.gaya_belajar" class="select select-bordered w-full bg-white/20 border-white/30">
-                            <option class="bg-dwali-dark" value="Visual">Visual</option>
-                            <option class="bg-dwali-dark" value="Auditori">Auditori</option>
-                            <option class="bg-dwali-dark" value="Kinestetik">Kinestetik</option>
-                            <option class="bg-dwali-dark" value="Baca/Tulis">Baca/Tulis</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label text-white">Cita-cita</label>
-                        <textarea x-model="potensiForm.cita_cita" class="textarea textarea-bordered w-full bg-white/20 border-white/30" placeholder="Aku ingin menjadi..."></textarea>
-                    </div>
-                    <div>
-                        <label class="label text-white">Kekuatan Karakter</label>
-                        <select x-model="potensiForm.kekuatan_karakter" class="select select-bordered w-full bg-white/20 border-white/30">
-                            <option class="bg-dwali-dark" value="Pemberani">Pemberani</option>
-                            <option class="bg-dwali-dark" value="Baik Hati">Baik Hati</option>
-                            <option class="bg-dwali-dark" value="Kreatif">Kreatif</option>
-                            <option class="bg-dwali-dark" value="Pantang Menyerah">Pantang Menyerah</option>
-                            <option class="bg-dwali-dark" value="Disiplin">Disiplin</option>
-                            <option class="bg-dwali-dark" value="Pemimpin">Pemimpin</option>
-                            <option class="bg-dwali-dark" value="Jujur">Jujur</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="label text-white">Ekstrakurikuler</label>
-                        <input type="text" x-model="potensiForm.ekstrakurikuler" class="input input-bordered w-full bg-white/20 border-white/30" placeholder="cth: Pramuka, Futsal">
-                    </div>
-                    <button @click="savePotensi()" class="btn btn-block bg-dwali-success text-white border-none hover:bg-green-600 mt-4" :disabled="loading">
-                        <span x-show="!loading">Simpan Peta Potensi</span>
-                        <span x-show="loading" class="spinner"></span>
-                    </button>
-                </div>
-            </div>
-        </template>
-
         <!-- STUDENT DASHBOARD -->
-        <template x-if="currentUser?.role === 'student' && currentUser.is_potensi_filled && view === 'student-dashboard'">
+        <template x-if="currentUser?.role === 'student' && view === 'student-dashboard'">
             <div class="space-y-6">
-                <div class="glass p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center">
+                <template x-if="!currentUser.is_potensi_filled">
+                    <div class="glass p-6 rounded-3xl shadow-xl max-w-2xl mx-auto">
+                        <h2 class="text-2xl font-bold mb-2">Peta Potensi Siswa 🗺️</h2>
+                        <p class="text-dwali-light mb-6">Lengkapi data berikut 1 kali saja. Ini akan membantu walimu memahamimu lebih baik.</p>
+                        
+                        <div class="space-y-4">
+                            <div>
+                                <label class="label text-white">Minat</label>
+                                <select x-model="potensiForm.minat" class="select select-bordered w-full bg-white/20 border-white/30">
+                                    <option class="bg-dwali-dark" value="Olahraga">Olahraga</option>
+                                    <option class="bg-dwali-dark" value="Seni">Seni</option>
+                                    <option class="bg-dwali-dark" value="Sains">Sains</option>
+                                    <option class="bg-dwali-dark" value="Teknologi">Teknologi</option>
+                                    <option class="bg-dwali-dark" value="Bahasa">Bahasa</option>
+                                    <option class="bg-dwali-dark" value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="label text-white">Gaya Belajar</label>
+                                <select x-model="potensiForm.gaya_belajar" class="select select-bordered w-full bg-white/20 border-white/30">
+                                    <option class="bg-dwali-dark" value="Visual">Visual</option>
+                                    <option class="bg-dwali-dark" value="Auditori">Auditori</option>
+                                    <option class="bg-dwali-dark" value="Kinestetik">Kinestetik</option>
+                                    <option class="bg-dwali-dark" value="Baca/Tulis">Baca/Tulis</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="label text-white">Cita-cita</label>
+                                <textarea x-model="potensiForm.cita_cita" class="textarea textarea-bordered w-full bg-white/20 border-white/30" placeholder="Aku ingin menjadi..."></textarea>
+                            </div>
+                            <div>
+                                <label class="label text-white">Kekuatan Karakter</label>
+                                <select x-model="potensiForm.kekuatan_karakter" class="select select-bordered w-full bg-white/20 border-white/30">
+                                    <option class="bg-dwali-dark" value="Pemberani">Pemberani</option>
+                                    <option class="bg-dwali-dark" value="Baik Hati">Baik Hati</option>
+                                    <option class="bg-dwali-dark" value="Kreatif">Kreatif</option>
+                                    <option class="bg-dwali-dark" value="Pantang Menyerah">Pantang Menyerah</option>
+                                    <option class="bg-dwali-dark" value="Disiplin">Disiplin</option>
+                                    <option class="bg-dwali-dark" value="Pemimpin">Pemimpin</option>
+                                    <option class="bg-dwali-dark" value="Jujur">Jujur</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="label text-white">Ekstrakurikuler</label>
+                                <input type="text" x-model="potensiForm.ekstrakurikuler" class="input input-bordered w-full bg-white/20 border-white/30" placeholder="cth: Pramuka, Futsal">
+                            </div>
+                            <button @click="savePotensi()" class="btn btn-block bg-dwali-success text-white border-none hover:bg-green-600 mt-4" :disabled="loading">
+                                <span x-show="!loading">Simpan Peta Potensi</span>
+                                <span x-show="loading" class="spinner"></span>
+                            </button>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="currentUser.is_potensi_filled">
                     <div>
-                        <h2 class="text-2xl font-bold">Halo, <span x-text="currentUser.name"></span>! 👋</h2>
-                        <p class="text-dwali-light">Kelas <span x-text="currentUser.class"></span></p>
-                    </div>
-                    <div class="mt-4 md:mt-0 text-center glass-dark p-3 rounded-xl">
-                        <p class="text-xs text-dwali-light">Status Peta Potensi</p>
-                        <p class="font-bold text-dwali-success">✅ Sudah Diisi</p>
-                    </div>
-                </div>
+                        <div class="glass p-6 rounded-3xl flex flex-col md:flex-row justify-between items-center">
+                            <div>
+                                <h2 class="text-2xl font-bold">Halo, <span x-text="currentUser.name"></span>! 👋</h2>
+                                <p class="text-dwali-light">Kelas <span x-text="currentUser.class"></span></p>
+                            </div>
+                            <div class="mt-4 md:mt-0 text-center glass-dark p-3 rounded-xl">
+                                <p class="text-xs text-dwali-light">Status Peta Potensi</p>
+                                <p class="font-bold text-dwali-success">✅ Sudah Diisi</p>
+                            </div>
+                        </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div @click="openGoodAction()" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center">
-                        <div class="text-5xl mb-2">⭐</div>
-                        <p class="font-bold">Perbuatan Baik</p>
-                        <p class="text-xs text-dwali-light" x-text="hasDoneGoodToday() ? '✔️ Sudah isi hari ini' : 'Klik untuk isi'"></p>
-                    </div>
+                        <div class="grid grid-cols-2 gap-4 mt-6">
+                            <div @click="openGoodAction()" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center">
+                                <div class="text-5xl mb-2">⭐</div>
+                                <p class="font-bold">Perbuatan Baik</p>
+                                <p class="text-xs text-dwali-light" x-text="hasDoneGoodToday() ? '✔️ Sudah isi hari ini' : 'Klik untuk isi'"></p>
+                            </div>
 
-                    <div @click="navigateTo('student-jurnal')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center">
-                        <div class="text-5xl mb-2">📔</div>
-                        <p class="font-bold">Jurnal Harian</p>
-                        <p class="text-xs text-dwali-light">Ceritakan harimu</p>
-                    </div>
+                            <div @click="navigateTo('student-jurnal')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center">
+                                <div class="text-5xl mb-2">📔</div>
+                                <p class="font-bold">Jurnal Harian</p>
+                                <p class="text-xs text-dwali-light">Ceritakan harimu</p>
+                            </div>
 
-                    <div @click="navigateTo('student-curhat')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center col-span-2">
-                        <div class="text-5xl mb-2">💬</div>
-                        <p class="font-bold">Kontak Curhat</p>
-                        <p class="text-xs text-dwali-light">Ada keluhan atau cerita? Sampaikan ke walimu.</p>
-                    </div>
+                            <div @click="navigateTo('student-curhat')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center col-span-2">
+                                <div class="text-5xl mb-2">💬</div>
+                                <p class="font-bold">Kontak Curhat</p>
+                                <p class="text-xs text-dwali-light">Ada keluhan atau cerita? Sampaikan ke walimu.</p>
+                            </div>
 
-                    <div @click="navigateTo('student-riwayat')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center col-span-2">
-                        <div class="text-5xl mb-2">📬</div>
-                        <p class="font-bold">Riwayat Curhatku</p>
-                        <p class="text-xs text-dwali-light">Cek balasan dari wali</p>
+                            <div @click="navigateTo('student-riwayat')" class="glass p-6 rounded-3xl flex flex-col items-center justify-center cursor-pointer hover:scale-105 transition-transform text-center col-span-2">
+                                <div class="text-5xl mb-2">📬</div>
+                                <p class="font-bold">Riwayat Curhatku</p>
+                                <p class="text-xs text-dwali-light">Cek balasan dari wali</p>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                </template>
             </div>
         </template>
 
@@ -495,8 +493,6 @@
             </div>
         </template>
 
-        <!-- ================= ADMIN VIEWS ================= -->
-
         <!-- ADMIN DASHBOARD -->
         <template x-if="currentUser?.role === 'admin' && view === 'admin-dashboard'">
             <div class="space-y-6">
@@ -681,7 +677,7 @@
 
     </main>
 
-    <!-- TOAST / MODAL Notif -->
+    <!-- TOAST -->
     <div x-show="toast.show" x-transition class="fixed bottom-10 left-1/2 -translate-x-1/2 z-50">
         <div class="glass-dark text-white px-6 py-3 rounded-full shadow-lg border border-dwali-yellow">
             <span x-text="toast.msg"></span>
@@ -691,8 +687,8 @@
 </div>
 
 <script>
-// ============ KONFIGURASI GOOGLE SHEETS ============
-// ⚠️ WAJIB GANTI dengan URL deployment Google Apps Script Anda!
+// ============ KONFIGURASI ============
+// ⚠️ GANTI DENGAN URL DEPLOYMENT ASLI!
 const API_URL = 'https://script.google.com/macros/s/AKfycby3tP9jgosbYkm_Q-XuAb5-laG_iz0Wp3KpQbt8oEnORaguI9XnQYnkhy_UK-zEYlPJLg/exec';
 
 async function callAPI(action, data = {}) {
@@ -704,7 +700,8 @@ async function callAPI(action, data = {}) {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
-            }
+            },
+            mode: 'cors' // ← PASTIKAN CORS ENABLED
         });
         
         if (!response.ok) {
@@ -733,17 +730,14 @@ function dwaliApp() {
         loadingMessage: 'Memuat data...',
         loadingProgress: 0,
         
-        // Navigation history
         viewHistory: [],
         
-        // Data cache
         cachedStudents: [],
         cachedCurhats: [],
         cachedJurnals: [],
         cachedPotensi: [],
         cachedPerbuatanBaik: [],
 
-        // Forms
         potensiForm: { minat: 'Olahraga', gaya_belajar: 'Visual', cita_cita: '', kekuatan_karakter: 'Pemberani', ekstrakurikuler: '' },
         jurnalForm: { perasaan: '', cerita: '' },
         curhatForm: { untuk_siapa: '', kategori: '', sub_kategori: '', tingkat_darurat: '', cerita: '' },
@@ -776,12 +770,10 @@ function dwaliApp() {
             setTimeout(() => this.toast.show = false, 3000);
         },
 
-        // ============ NAVIGATION FIX ============
         navigateTo(view) {
             if (this.view === view) return;
             this.viewHistory.push(view);
             this.view = view;
-            // Reset scroll ke atas
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
@@ -791,7 +783,6 @@ function dwaliApp() {
                 this.view = this.viewHistory[this.viewHistory.length - 1];
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             } else {
-                // Jika tidak ada history, langsung ke dashboard
                 this.goToHome();
             }
         },
@@ -808,14 +799,12 @@ function dwaliApp() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         },
 
-        // ============ LOADING WITH PROGRESS ============
         async withLoading(message, callback) {
             this.loading = true;
             this.loadingMessage = message || 'Memuat data...';
             this.loadingProgress = 0;
             
             try {
-                // Simulasi progress
                 const progressInterval = setInterval(() => {
                     if (this.loadingProgress < 90) {
                         this.loadingProgress += Math.random() * 15;
@@ -851,36 +840,60 @@ function dwaliApp() {
 
         // --- AUTH ---
         async studentLogin() {
-            await this.withLoading('Login sebagai siswa...', async () => {
-                const result = await callAPI('loginStudent', {
-                    name: this.loginForm.name,
-                    class: this.loginForm.class,
-                    password: this.loginForm.password
+            try {
+                await this.withLoading('Login sebagai siswa...', async () => {
+                    const result = await callAPI('loginStudent', {
+                        name: this.loginForm.name,
+                        class: this.loginForm.class,
+                        password: this.loginForm.password
+                    });
+                    
+                    console.log('🔐 Student login result:', result);
+                    
+                    if (!result || !result.id) {
+                        throw new Error('Data siswa tidak valid!');
+                    }
+                    
+                    this.currentUser = result;
+                    localStorage.setItem('dwali_user', JSON.stringify(result));
+                    const homeView = 'student-dashboard';
+                    this.view = homeView;
+                    this.viewHistory = [homeView];
+                    this.showToast('✅ Login berhasil!');
+                    await this.loadData();
                 });
-                this.currentUser = result;
-                localStorage.setItem('dwali_user', JSON.stringify(result));
-                const homeView = 'student-dashboard';
-                this.view = homeView;
-                this.viewHistory = [homeView];
-                this.showToast('✅ Login berhasil!');
-                await this.loadData();
-            });
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                alert('❌ ' + (error.message || 'Login gagal! Cek koneksi atau data Anda.'));
+            }
         },
 
         async adminLogin() {
-            await this.withLoading('Login sebagai wali kelas...', async () => {
-                const result = await callAPI('loginAdmin', {
-                    email: this.loginForm.email,
-                    password: this.loginForm.password
+            try {
+                await this.withLoading('Login sebagai wali kelas...', async () => {
+                    const result = await callAPI('loginAdmin', {
+                        email: this.loginForm.email,
+                        password: this.loginForm.password
+                    });
+                    
+                    console.log('🔐 Admin login result:', result);
+                    
+                    if (!result || !result.id) {
+                        throw new Error('Data admin tidak valid!');
+                    }
+                    
+                    this.currentUser = result;
+                    localStorage.setItem('dwali_user', JSON.stringify(result));
+                    const homeView = 'admin-dashboard';
+                    this.view = homeView;
+                    this.viewHistory = [homeView];
+                    this.showToast('✅ Selamat datang, Wali!');
+                    await this.loadData();
                 });
-                this.currentUser = result;
-                localStorage.setItem('dwali_user', JSON.stringify(result));
-                const homeView = 'admin-dashboard';
-                this.view = homeView;
-                this.viewHistory = [homeView];
-                this.showToast('✅ Selamat datang, Wali!');
-                await this.loadData();
-            });
+            } catch (error) {
+                console.error('❌ Login error:', error);
+                alert('❌ ' + (error.message || 'Login gagal! Cek koneksi atau data Anda.'));
+            }
         },
 
         logout() {
@@ -1082,7 +1095,6 @@ function dwaliApp() {
             }
             await this.withLoading('Menambahkan siswa...', async () => {
                 await callAPI('addStudent', {
-                    id: 's' + Date.now(),
                     nis: this.newStudent.nis,
                     name: this.newStudent.name,
                     wali_id: this.currentUser.id,
@@ -1133,7 +1145,6 @@ function dwaliApp() {
                     wali_id: this.currentUser.id
                 });
                 this.cachedCurhats = result || [];
-                // Inisialisasi replyText untuk curhat yang belum dibalas
                 this.cachedCurhats.forEach(c => {
                     if (!c.balasan && !this.replyText[c.id]) {
                         this.replyText[c.id] = '';
@@ -1158,7 +1169,6 @@ function dwaliApp() {
                     balasan: reply.trim(),
                     balasan_at: new Date().toISOString()
                 });
-                // Update lokal
                 const curhat = this.cachedCurhats.find(c => c.id === curhatId);
                 if (curhat) {
                     curhat.balasan = reply.trim();
@@ -1233,7 +1243,6 @@ function dwaliApp() {
             this.showToast('📥 Excel berhasil diunduh!');
         },
 
-        // --- HELPER ---
         formatDate(dateStr) {
             if (!dateStr) return '-';
             try {

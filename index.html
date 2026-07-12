@@ -1,740 +1,2775 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>D'WALI - Digital Wali</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .glass-dark {
-            background: rgba(6, 78, 59, 0.4);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        .scrollbar-hide::-webkit-scrollbar { display: none; }
-        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
-        [x-cloak] { display: none !important; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>Wali Digital</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.1/dist/full.css" rel="stylesheet" type="text/css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz@14..32&family=Orbitron:wght@400;600;700;900&family=Exo+2:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* ========== ROOT — BIRU CERAH + AKSEN UNGU & MERAH ========== */
+    :root {
+      --bg-deep: #0044bb;
+      --bg-mid: #0055dd;
+      --bg-card: rgba(0, 30, 100, 0.55);
+      --bg-card-hover: rgba(0, 40, 120, 0.7);
+      --blue-primary: #0070ff;
+      --blue-bright: #0090ff;
+      --blue-cyan: #00bbff;
+      --blue-light: #44ccff;
+      --purple-primary: #8b5cf6;
+      --purple-bright: #a78bfa;
+      --purple-glow: rgba(139, 92, 246, 0.35);
+      --red-primary: #ef4444;
+      --red-bright: #f87171;
+      --red-glow: rgba(239, 68, 68, 0.3);
+      --text-primary: #ffffff;
+      --text-secondary: #c4daff;
+      --text-muted: #7eaadd;
+      --glow-purple: 0 0 25px var(--purple-glow), 0 0 60px rgba(139, 92, 246, 0.1);
+      --glow-red: 0 0 25px var(--red-glow), 0 0 60px rgba(239, 68, 68, 0.08);
+      --glow-blue: 0 0 25px rgba(0, 112, 255, 0.2), 0 0 60px rgba(0, 112, 255, 0.06);
+      --border-glow: 1px solid rgba(139, 92, 246, 0.2);
+    }
+
+    * { font-family: 'Exo 2', 'Inter', sans-serif; box-sizing: border-box; }
+    body {
+      background: linear-gradient(155deg, #003db3 0%, #0060ee 40%, #0078ff 70%, #0055cc 100%);
+      min-height: 100vh;
+      color: var(--text-primary);
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 500px 400px at 10% 15%, rgba(139, 92, 246, 0.18), transparent),
+        radial-gradient(ellipse 400px 400px at 90% 85%, rgba(239, 68, 68, 0.12), transparent),
+        radial-gradient(ellipse 600px 300px at 50% 50%, rgba(0, 112, 255, 0.08), transparent);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .cyber-grid {
+      position: fixed; inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 50px 50px;
+      z-index: 0; pointer-events: none;
+    }
+
+    .orb {
+      position: fixed; border-radius: 50%; filter: blur(70px);
+      z-index: 0; pointer-events: none;
+      animation: orbFloat 10s ease-in-out infinite;
+    }
+    .orb-1 { width: 280px; height: 280px; background: rgba(139, 92, 246, 0.18); top: 2%; left: -80px; }
+    .orb-2 { width: 230px; height: 230px; background: rgba(239, 68, 68, 0.14); bottom: 5%; right: -60px; animation-delay: -3s; animation-duration: 13s; }
+    .orb-3 { width: 180px; height: 180px; background: rgba(0, 187, 255, 0.12); top: 45%; left: 55%; animation-delay: -6s; animation-duration: 15s; }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(25px, -15px) scale(1.06); }
+      66% { transform: translate(-15px, 12px) scale(0.95); }
+    }
+
+    .scanline {
+      position: fixed; top: 0; left: 0; right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.5), transparent);
+      opacity: 0.2; z-index: 1; pointer-events: none;
+      animation: scanMove 5s linear infinite;
+    }
+    @keyframes scanMove { 0% { top: -2px; } 100% { top: 100%; } }
+
+    #connectionStatus, #loginPage, #studentDashboard, #waliDashboard, #adminDashboard,
+    .modal, .modal-box, #riwayatPanel { position: relative; z-index: 10; }
+
+    .card-glass {
+      background: var(--bg-card);
+      backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+      border-radius: 20px;
+      box-shadow: var(--glow-purple), 0 8px 32px rgba(0, 0, 0, 0.15);
+      border: var(--border-glow);
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .card-glass:hover {
+      background: var(--bg-card-hover);
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.25), 0 12px 40px rgba(0, 0, 0, 0.2);
+      border-color: rgba(139, 92, 246, 0.4);
+    }
+
+    .bg-glass {
+      background: rgba(0, 30, 100, 0.5);
+      backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+      border: var(--border-glow);
+    }
+
+    .btn-primary-custom {
+      background: linear-gradient(135deg, var(--purple-primary), #6d28d9);
+      color: #fff; border: none; font-weight: 700;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      box-shadow: 0 0 22px var(--purple-glow), 0 4px 15px rgba(0,0,0,0.15);
+      transition: all 0.3s; letter-spacing: 0.3px;
+    }
+    .btn-primary-custom:hover {
+      background: linear-gradient(135deg, var(--purple-bright), #7c3aed);
+      box-shadow: 0 0 38px rgba(139, 92, 246, 0.45), 0 6px 20px rgba(0,0,0,0.2);
+      transform: translateY(-1px);
+    }
+
+    .btn-ghost { color: var(--text-secondary); }
+    .btn-ghost:hover { background: rgba(139, 92, 246, 0.12); color: var(--purple-bright); }
+
+    .btn-outline {
+      border-color: rgba(139, 92, 246, 0.3) !important;
+      color: var(--text-primary) !important;
+      background: rgba(139, 92, 246, 0.06) !important;
+      transition: all 0.3s !important;
+    }
+    .btn-outline:hover {
+      border-color: var(--purple-primary) !important;
+      background: rgba(139, 92, 246, 0.16) !important;
+      box-shadow: 0 0 18px rgba(139, 92, 246, 0.2);
+      color: #fff !important;
+    }
+
+    .input, .select, .textarea {
+      background: rgba(0, 20, 80, 0.55) !important;
+      border-color: rgba(139, 92, 246, 0.2) !important;
+      color: var(--text-primary) !important;
+      border-radius: 12px !important;
+      transition: all 0.3s !important;
+    }
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--purple-primary) !important;
+      box-shadow: 0 0 22px rgba(139, 92, 246, 0.2), inset 0 0 10px rgba(139, 92, 246, 0.04) !important;
+      outline: none !important;
+    }
+    .input::placeholder, .textarea::placeholder { color: var(--text-muted) !important; }
+    .label-text { color: var(--text-secondary) !important; font-weight: 600; font-size: 0.8rem; letter-spacing: 0.3px; }
+    select option { background: #002266; color: #fff; }
+
+    .bottom-nav {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(0, 20, 80, 0.75);
+      backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(139, 92, 246, 0.15);
+      display: flex; justify-content: space-around;
+      padding: 10px 0 14px; z-index: 50;
+      border-radius: 24px 24px 0 0;
+      box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.15);
+    }
+    .nav-btn {
+      display: flex; flex-direction: column; align-items: center;
+      font-size: 11px; color: var(--text-muted);
+      transition: all 0.3s; background: transparent; border: none;
+      padding: 6px 14px; border-radius: 16px; position: relative; letter-spacing: 0.3px;
+    }
+    .nav-btn i { font-size: 22px; margin-bottom: 3px; transition: all 0.3s; }
+    .nav-btn.active {
+      color: #fff; font-weight: 700;
+      background: rgba(139, 92, 246, 0.25);
+      text-shadow: 0 0 10px rgba(255,255,255,0.3);
+    }
+    .nav-btn.active i { filter: drop-shadow(0 0 10px rgba(139, 92, 246, 0.6)); }
+    .nav-btn:hover:not(.active) { color: var(--text-secondary); background: rgba(139, 92, 246, 0.08); }
+
+    .modal-box {
+      border-radius: 24px !important;
+      background: rgba(0, 18, 70, 0.92) !important;
+      backdrop-filter: blur(24px) !important; -webkit-backdrop-filter: blur(24px) !important;
+      max-height: 90vh; overflow-y: auto;
+      border: var(--border-glow) !important;
+      box-shadow: 0 0 70px rgba(139, 92, 246, 0.12), 0 25px 60px rgba(0, 0, 0, 0.3) !important;
+      color: var(--text-primary);
+    }
+    .modal-box .btn-circle {
+      background: rgba(139, 92, 246, 0.15); color: var(--text-secondary);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+    }
+    .modal-box .btn-circle:hover {
+      background: rgba(239, 68, 68, 0.2); color: var(--red-bright);
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+    .modal-action .btn-ghost { color: var(--text-muted); border: 1px solid rgba(139, 92, 246, 0.15); }
+
+    .bubble {
+      max-width: 85%; padding: 10px 14px; border-radius: 16px;
+      margin: 4px 0; word-wrap: break-word; font-size: 0.85rem; line-height: 1.5;
+    }
+    .bubble-left {
+      background: rgba(139, 92, 246, 0.18);
+      border: 1px solid rgba(139, 92, 246, 0.2);
+      align-self: flex-start; border-bottom-left-radius: 4px; color: #fff;
+    }
+    .bubble-right {
+      background: rgba(0, 112, 255, 0.2);
+      border: 1px solid rgba(0, 112, 255, 0.25);
+      align-self: flex-end; border-bottom-right-radius: 4px; color: #fff;
+    }
+    .bubble-wali {
+      background: rgba(139, 92, 246, 0.25);
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      align-self: flex-start; border-bottom-left-radius: 4px; color: #fff;
+    }
+    .bubble-siswa {
+      background: rgba(0, 187, 255, 0.15);
+      border: 1px solid rgba(0, 187, 255, 0.2);
+      align-self: flex-end; border-bottom-right-radius: 4px; color: #fff;
+    }
+    .chat-container { display: flex; flex-direction: column; max-height: 400px; overflow-y: auto; padding: 8px 4px; }
+
+    .connection-status {
+      position: fixed; top: 12px; right: 12px; z-index: 100;
+      padding: 5px 14px; border-radius: 20px; font-size: 11px;
+      font-weight: 700; letter-spacing: 0.5px;
+      background: rgba(0, 18, 70, 0.7); backdrop-filter: blur(12px);
+    }
+    .connection-status.online {
+      color: #4ade80; border: 1px solid rgba(74, 222, 128, 0.3);
+      box-shadow: 0 0 12px rgba(74, 222, 128, 0.1);
+    }
+    .connection-status.offline {
+      color: var(--red-bright); border: 1px solid rgba(248, 113, 113, 0.3);
+      box-shadow: 0 0 12px rgba(248, 113, 113, 0.1);
+    }
+
+    .status-badge {
+      display: inline-block; padding: 3px 12px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .status-red { background: rgba(239, 68, 68, 0.2); color: var(--red-bright); border: 1px solid rgba(239, 68, 68, 0.25); }
+    .status-yellow { background: rgba(250, 204, 21, 0.2); color: #fde047; border: 1px solid rgba(250, 204, 21, 0.25); }
+    .status-green { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.25); }
+
+    .login-container { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .login-box { max-width: 420px; width: 100%; }
+
+    .student-card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); cursor: pointer; }
+    .student-card:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 0 45px rgba(139, 92, 246, 0.22), 0 16px 50px rgba(0, 0, 0, 0.15);
+      border-color: rgba(139, 92, 246, 0.45);
+    }
+
+    .tab-active {
+      border-bottom: 3px solid var(--purple-bright) !important;
+      color: #fff !important;
+      font-weight: 700 !important;
+      text-shadow: 0 0 8px var(--purple-glow);
+    }
+
+    .report-section {
+      background: rgba(0, 25, 90, 0.5); border-radius: 16px;
+      padding: 16px; margin-top: 12px; border: var(--border-glow);
+    }
+    .report-item {
+      display: flex; justify-content: space-between; padding: 8px 0;
+      border-bottom: 1px solid rgba(139, 92, 246, 0.08); font-size: 0.85rem;
+    }
+    .report-item:last-child { border-bottom: none; }
+
+    .fade-in { animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(15px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes pulseGlow {
+      0%, 100% { box-shadow: 0 0 25px rgba(139, 92, 246, 0.2), 0 8px 32px rgba(0,0,0,0.15); }
+      50% { box-shadow: 0 0 45px rgba(139, 92, 246, 0.35), 0 12px 40px rgba(0,0,0,0.2); }
+    }
+    @keyframes textShimmer {
+      0% { background-position: -200% center; }
+      100% { background-position: 200% center; }
+    }
+
+    .gradient-text {
+      background: linear-gradient(90deg, var(--purple-bright), #fff, var(--red-bright), var(--purple-bright));
+      background-size: 200% auto;
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; animation: textShimmer 4s linear infinite;
+    }
+
+    .glow-icon { filter: drop-shadow(0 0 8px currentColor); transition: all 0.3s; }
+    .glow-icon:hover { filter: drop-shadow(0 0 16px currentColor); transform: scale(1.1); }
+
+    .motivation-box {
+      background: rgba(139, 92, 246, 0.1);
+      border: 1px solid rgba(139, 92, 246, 0.15);
+      position: relative; overflow: hidden;
+    }
+    .motivation-box::before {
+      content: ''; position: absolute; top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(139, 92, 246, 0.1), transparent);
+      animation: shimmerSlide 5s ease-in-out infinite;
+    }
+    @keyframes shimmerSlide {
+      0% { left: -100%; } 50% { left: 100%; } 100% { left: 100%; }
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+    ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.3); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.5); }
+
+    .divider { border-top-color: rgba(139, 92, 246, 0.12) !important; }
+    .border-b { border-color: rgba(139, 92, 246, 0.12) !important; }
+
+    #riwayatPanel > div {
+      background: rgba(0, 18, 70, 0.92) !important;
+      backdrop-filter: blur(24px) !important;
+      border: var(--border-glow) !important;
+      box-shadow: 0 0 70px rgba(139, 92, 246, 0.12), 0 25px 60px rgba(0, 0, 0, 0.3) !important;
+    }
+
+    .icon-purple { color: var(--purple-bright); filter: drop-shadow(0 0 10px var(--purple-glow)); }
+    .icon-red { color: var(--red-bright); filter: drop-shadow(0 0 10px var(--red-glow)); }
+    .icon-blue { color: var(--blue-cyan); filter: drop-shadow(0 0 10px rgba(0,187,255,0.4)); }
+    .icon-yellow { color: #fde047; filter: drop-shadow(0 0 10px rgba(253,224,71,0.4)); }
+    .icon-green { color: #4ade80; filter: drop-shadow(0 0 10px rgba(74,222,128,0.4)); }
+    .icon-white { color: #fff; filter: drop-shadow(0 0 8px rgba(255,255,255,0.3)); }
+
+    .futuristic-badge {
+      background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(239, 68, 68, 0.15));
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      color: #fff; font-weight: 700;
+      letter-spacing: 0.5px; font-size: 0.7rem; text-transform: uppercase;
+    }
+
+    .stat-card { position: relative; overflow: hidden; }
+    .stat-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px; border-radius: 0 0 20px 20px;
+    }
+    .stat-card.stat-blue::after { background: linear-gradient(90deg, var(--blue-primary), transparent); }
+    .stat-card.stat-red::after { background: linear-gradient(90deg, var(--red-primary), transparent); }
+    .stat-card.stat-yellow::after { background: linear-gradient(90deg, #facc15, transparent); }
+    .stat-card.stat-purple::after { background: linear-gradient(90deg, var(--purple-primary), transparent); }
+
+    .bg-indigo-50 { background: rgba(139, 92, 246, 0.08) !important; }
+    .wali-card { transition: all 0.3s; cursor: pointer; }
+    .wali-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(139, 92, 246, 0.2); }
+
+    .curhat-message {
+      padding: 10px 14px;
+      border-radius: 12px;
+      margin: 4px 0;
+      max-width: 85%;
+      word-wrap: break-word;
+    }
+    .curhat-message-siswa {
+      background: rgba(0, 112, 255, 0.15);
+      border: 1px solid rgba(0, 112, 255, 0.2);
+      align-self: flex-end;
+      border-bottom-right-radius: 4px;
+    }
+    .curhat-message-wali {
+      background: rgba(139, 92, 246, 0.2);
+      border: 1px solid rgba(139, 92, 246, 0.25);
+      align-self: flex-start;
+      border-bottom-left-radius: 4px;
+    }
+    .curhat-message-sistem {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      align-self: center;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      max-width: 90%;
+    }
+    .message-time {
+      font-size: 0.6rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+      text-align: right;
+    }
+    .message-sender {
+      font-size: 0.65rem;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .message-sender-siswa { color: var(--blue-cyan); }
+    .message-sender-wali { color: var(--purple-bright); }
+  </style>
 </head>
-<body class="min-h-screen bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070&auto=format&fit=crop');">
+<body>
 
-<div x-data="dWaliApp()" x-init="init()" class="min-h-screen w-full flex justify-center text-white">
+<!-- Background Effects -->
+<div class="cyber-grid"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+<div class="scanline"></div>
 
-    <!-- NOTIFICATION TOAST -->
-    <div x-show="notif.show" x-transition class="fixed top-4 left-1/2 -translate-x-1/2 z-50 glass-dark px-6 py-3 rounded-xl shadow-lg">
-        <span x-text="notif.text"></span>
-    </div>
-
-    <!-- LOGIN VIEW -->
-    <div x-show="!isLoggedIn" class="w-full max-w-md p-6 flex flex-col justify-center min-h-screen">
-        <div class="glass rounded-3xl p-8 text-center shadow-2xl">
-            <img src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=300&auto=format&fit=crop" class="w-24 h-24 rounded-full mx-auto mb-4 object-cover border-4 border-white/50" alt="Logo">
-            <h1 class="text-3xl font-extrabold text-yellow-300 tracking-wide">D'WALI</h1>
-            <p class="text-green-100 text-sm mb-6">Digital Wali Murid</p>
-            
-            <div class="flex gap-2 mb-6 bg-black/20 p-1 rounded-full">
-                <button @click="loginRole='student'" :class="loginRole==='student' ? 'bg-yellow-400 text-green-900' : 'text-white'" class="flex-1 py-2 rounded-full font-semibold transition">Siswa</button>
-                <button @click="loginRole='admin'" :class="loginRole==='admin' ? 'bg-yellow-400 text-green-900' : 'text-white'" class="flex-1 py-2 rounded-full font-semibold transition">Wali Kelas</button>
-            </div>
-
-            <!-- Student Login -->
-            <div x-show="loginRole==='student'" class="space-y-3">
-                <input type="text" x-model="loginForm.name" placeholder="Nama Siswa" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                <input type="text" x-model="loginForm.class" placeholder="Kelas (Misal: 7A)" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                <input type="password" x-model="loginForm.pin" placeholder="PIN / Password" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                <button @click="loginStudent()" class="w-full bg-yellow-400 text-green-900 font-bold py-3 rounded-xl hover:bg-yellow-300 transition">Masuk</button>
-            </div>
-
-            <!-- Admin Login -->
-            <div x-show="loginRole==='admin'" class="space-y-3">
-                <input type="email" x-model="loginForm.email" placeholder="Email Wali" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                <input type="password" x-model="loginForm.pass" placeholder="Password" class="w-full px-4 py-3 rounded-xl bg-white/20 placeholder-green-100 focus:outline-none focus:ring-2 focus:ring-yellow-300">
-                <button @click="loginAdmin()" class="w-full bg-yellow-400 text-green-900 font-bold py-3 rounded-xl hover:bg-yellow-300 transition">Masuk</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- STUDENT VIEW -->
-    <div x-show="isLoggedIn && role==='student'" class="w-full max-w-md pb-24 relative">
-        
-        <!-- MODAL PETA POTENSI -->
-        <div x-show="studentView==='potensi'" class="absolute inset-0 z-40 bg-black/60 flex items-center justify-center p-4 overflow-y-auto">
-            <div class="glass rounded-3xl p-6 w-full my-10">
-                <h2 class="text-2xl font-bold text-yellow-300 mb-2">Peta Potensi Siswa</h2>
-                <p class="text-sm text-green-100 mb-4">Lengkapi data diri ini sekali saja.</p>
-                
-                <div class="space-y-4 text-sm">
-                    <div>
-                        <label class="font-semibold block mb-2">Minat (Pilih satu)</label>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="m in ['Olahraga','Seni','Sains','Teknologi','Bahasa','Lainnya']">
-                                <button @click="potensiForm.minat = m" :class="potensiForm.minat===m ? 'bg-yellow-400 text-green-900' : 'bg-white/20'" class="px-3 py-1 rounded-full text-xs" x-text="m"></button>
-                            </template>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="font-semibold block mb-2">Gaya Belajar</label>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="g in ['Visual','Auditori','Kinestetik','Baca/Tulis']">
-                                <button @click="potensiForm.gaya = g" :class="potensiForm.gaya===g ? 'bg-yellow-400 text-green-900' : 'bg-white/20'" class="px-3 py-1 rounded-full text-xs" x-text="g"></button>
-                            </template>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="font-semibold block mb-2">Cita-cita</label>
-                        <textarea x-model="potensiForm.cita_cita" class="w-full bg-white/20 rounded-xl p-3 text-white placeholder-green-100" rows="2" placeholder="Saya ingin menjadi..."></textarea>
-                    </div>
-                    <div>
-                        <label class="font-semibold block mb-2">Kekuatan Karakter</label>
-                        <div class="flex flex-wrap gap-2">
-                            <template x-for="k in ['Pemberani','Baik Hati','Kreatif','Pantang Menyerah','Disiplin','Pemimpin','Jujur']">
-                                <button @click="potensiForm.karakter = k" :class="potensiForm.karakter===k ? 'bg-yellow-400 text-green-900' : 'bg-white/20'" class="px-3 py-1 rounded-full text-xs" x-text="k"></button>
-                            </template>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="font-semibold block mb-2">Ekstrakurikuler</label>
-                        <input type="text" x-model="potensiForm.ekskul" class="w-full bg-white/20 rounded-xl p-3 text-white placeholder-green-100" placeholder="Pramuka, Futsal, dll">
-                    </div>
-                </div>
-                <button @click="savePotensi()" class="w-full bg-green-600 mt-6 py-3 rounded-xl font-bold hover:bg-green-500">Simpan & Lanjut</button>
-            </div>
-        </div>
-
-        <!-- STUDENT DASHBOARD -->
-        <div x-show="studentView==='dashboard'" class="min-h-screen p-6">
-            <div class="flex justify-between items-center mb-6">
-                <div>
-                    <p class="text-green-100 text-sm">Selamat datang,</p>
-                    <h1 class="text-2xl font-bold" x-text="currentUser.name"></h1>
-                </div>
-                <button @click="logout()" class="glass-dark p-2 rounded-full text-xs">Keluar</button>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-                <!-- Perbuatan Baik -->
-                <div class="col-span-2 glass rounded-3xl p-6 text-center">
-                    <h3 class="font-bold text-lg mb-3">Perbuatan Baik Hari Ini</h3>
-                    <template x-if="!currentUser.perbuatan_baik_today">
-                        <button @click="openModal('perbuatanBaik')" class="bg-yellow-400 text-green-900 text-5xl w-20 h-20 rounded-full mx-auto flex items-center justify-center shadow-lg">⭐</button>
-                    </template>
-                    <template x-if="currentUser.perbuatan_baik_today">
-                        <div class="text-green-300 font-bold py-4">✔️ Sudah Berbuat Baik Hari Ini!</div>
-                    </template>
-                </div>
-
-                <button @click="openModal('curhat')" class="glass rounded-3xl p-6 text-center hover:scale-105 transition">
-                    <div class="text-4xl mb-2">💬</div>
-                    <div class="font-semibold">Kontak Curhat</div>
-                </button>
-
-                <button @click="openModal('jurnal')" class="glass rounded-3xl p-6 text-center hover:scale-105 transition">
-                    <div class="text-4xl mb-2">📔</div>
-                    <div class="font-semibold">Jurnal Harian</div>
-                </button>
-
-                <button @click="studentView='riwayat'" class="col-span-2 glass rounded-3xl p-6 text-center flex items-center justify-between hover:scale-[1.02] transition">
-                    <div class="text-left">
-                        <div class="font-semibold text-lg">Riwayat Curhatku</div>
-                        <div class="text-xs text-green-100">Lihat balasan dari wali</div>
-                    </div>
-                    <div class="text-4xl">📨</div>
-                </button>
-            </div>
-        </div>
-
-        <!-- STUDENT RIWAYAT CURHAT -->
-        <div x-show="studentView==='riwayat'" class="min-h-screen p-6">
-            <button @click="studentView='dashboard'" class="mb-4 text-sm flex items-center gap-2"><- Kembali</button>
-            <h2 class="text-2xl font-bold mb-4">Riwayat Curhat</h2>
-            <div class="space-y-3">
-                <template x-for="c in curhats.filter(c => c.student_id === currentUser.id)" :key="c.id">
-                    <div class="glass rounded-2xl p-4">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs text-green-100" x-text="new Date(c.created_at).toLocaleDateString()"></span>
-                            <span :class="c.balasan ? 'bg-green-500' : 'bg-yellow-400 text-green-900'" class="text-xs px-2 py-1 rounded-full font-semibold" x-text="c.balasan ? 'Dibalas' : 'Menunggu'"></span>
-                        </div>
-                        <p class="text-sm mb-2" x-text="'"' + c.cerita + '"'"></p>
-                        <div x-show="c.balasan" class="bg-black/20 p-3 rounded-xl mt-2">
-                            <p class="text-xs text-yellow-300 font-bold mb-1">Balasan Wali:</p>
-                            <p class="text-sm" x-text="c.balasan"></p>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-        <!-- MODAL PERBUATAN BAIK -->
-        <div x-show="activeModal==='perbuatanBaik'" x-transition class="fixed inset-0 z-50 bg-black/60 flex items-end justify-center" @click.self="activeModal=null">
-            <div class="glass w-full max-w-md rounded-t-3xl p-6">
-                <h3 class="text-xl font-bold mb-4 text-center">Apa yang kamu lakukan?</h3>
-                <div class="space-y-2">
-                    <template x-for="act in ['Aku membantu teman', 'Aku berbagi makanan', 'Aku menjaga kebersihan', 'Aku berkata jujur', 'Lainnya']">
-                        <button @click="savePerbuatanBaik(act)" class="w-full bg-white/20 hover:bg-yellow-400 hover:text-green-900 transition py-3 rounded-xl font-semibold" x-text="act"></button>
-                    </template>
-                </div>
-            </div>
-        </div>
-
-        <!-- MODAL JURNAL -->
-        <div x-show="activeModal==='jurnal'" x-transition class="fixed inset-0 z-50 bg-black/60 flex items-end justify-center" @click.self="activeModal=null">
-            <div class="glass w-full max-w-md rounded-t-3xl p-6">
-                <h3 class="text-xl font-bold mb-4 text-center">Jurnal Hari Ini</h3>
-                <label class="text-sm text-green-100">Bagaimana perasaanmu?</label>
-                <div class="flex justify-around my-4 text-4xl">
-                    <template x-for="e in ['😊','😐','😢','😡','😴']">
-                        <button @click="jurnalForm.perasaan = e" :class="jurnalForm.perasaan===e ? 'scale-125 bg-white/20 rounded-full p-2' : ''" x-text="e"></button>
-                    </template>
-                </div>
-                <textarea x-model="jurnalForm.cerita" class="w-full bg-white/20 rounded-xl p-3 text-white placeholder-green-100" rows="3" placeholder="Ceritakan harimu..."></textarea>
-                <button @click="saveJurnal()" class="w-full bg-green-600 mt-4 py-3 rounded-xl font-bold">Simpan Jurnal</button>
-            </div>
-        </div>
-
-        <!-- MODAL CURHAT (Chat Flow) -->
-        <div x-show="activeModal==='curhat'" x-transition class="fixed inset-0 z-50 bg-black/80 flex flex-col p-4">
-            <div class="flex justify-between items-center mb-4">
-                <h3 class="text-xl font-bold">Curhat Wali</h3>
-                <button @click="activeModal=null" class="text-red-400">Tutup</button>
-            </div>
-            <div class="flex-1 overflow-y-auto space-y-3 mb-4 scrollbar-hide">
-                <!-- Chat Bubble Dinamis -->
-                <template x-for="(msg, i) in curhatChat" :key="i">
-                    <div :class="msg.type === 'bot' ? 'text-left' : 'text-right'">
-                        <div :class="msg.type === 'bot' ? 'bg-white/20' : 'bg-yellow-400 text-green-900'" class="inline-block px-4 py-2 rounded-2xl max-w-[80%]" x-text="msg.text"></div>
-                    </div>
-                </template>
-                
-                <div x-show="curhatStep === 1" class="flex gap-2 justify-end">
-                    <button @click="answerCurhat('untuk', 'Aku sendiri')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Aku sendiri</button>
-                    <button @click="answerCurhat('untuk', 'Temanku')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Curhat teman</button>
-                </div>
-                <div x-show="curhatStep === 2" class="flex gap-2 justify-end">
-                    <button @click="answerCurhat('kategori', 'Rumah')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Rumah</button>
-                    <button @click="answerCurhat('kategori', 'Sekolah')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Sekolah</button>
-                </div>
-                <div x-show="curhatStep === 3 && curhatForm.kategori === 'Rumah'" class="flex flex-wrap gap-2 justify-end">
-                    <template x-for="s in ['Orang tua','Saudara','Keuangan','Lainnya']">
-                        <button @click="answerCurhat('sub', s)" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold" x-text="s"></button>
-                    </template>
-                </div>
-                <div x-show="curhatStep === 3 && curhatForm.kategori === 'Sekolah'" class="flex flex-wrap gap-2 justify-end">
-                    <template x-for="s in ['Perundungan','Pelajaran','Teman','Guru','Lainnya']">
-                        <button @click="answerCurhat('sub', s)" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold" x-text="s"></button>
-                    </template>
-                </div>
-                <div x-show="curhatStep === 4" class="flex gap-2 justify-end">
-                    <button @click="answerCurhat('darurat', 'Cerita')" class="bg-green-500 px-4 py-2 rounded-full text-sm font-semibold">Mau cerita</button>
-                    <button @click="answerCurhat('darurat', 'Saran')" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-full text-sm font-semibold">Butuh saran</button>
-                    <button @click="answerCurhat('darurat', 'Bantuan')" class="bg-red-500 px-4 py-2 rounded-full text-sm font-semibold">Bantuan Sekarang!</button>
-                </div>
-                
-                <div x-show="curhatStep === 5" class="mt-4">
-                    <textarea x-model="curhatForm.cerita" class="w-full bg-white/20 rounded-xl p-3 text-white" rows="4" placeholder="Ceritakan masalahnya..."></textarea>
-                    <button @click="submitCurhat()" class="w-full bg-green-600 mt-2 py-3 rounded-xl font-bold">Kirim Curhat</button>
-                </div>
-            </div>
-        </div>
-
-    </div>
-
-    <!-- ADMIN VIEW -->
-    <div x-show="isLoggedIn && role==='admin'" class="w-full max-w-4xl pb-24 p-4 md:p-8">
-        
-        <!-- HEADER -->
-        <div class="flex justify-between items-center mb-6">
-            <div>
-                <p class="text-green-100 text-sm">Dashboard Wali Kelas</p>
-                <h1 class="text-2xl md:text-3xl font-bold" x-text="currentUser.name"></h1>
-            </div>
-            <button @click="logout()" class="glass-dark px-4 py-2 rounded-xl text-sm">Keluar</button>
-        </div>
-
-        <!-- TABS -->
-        <div class="flex gap-2 mb-6 glass-dark p-1 rounded-full overflow-x-auto scrollbar-hide">
-            <button @click="adminView='siswa'" :class="adminView==='siswa' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Daftar Siswa</button>
-            <button @click="adminView='curhat'" :class="adminView==='curhat' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Inbox Curhat</button>
-            <button @click="adminView='laporan'" :class="adminView==='laporan' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Laporan</button>
-            <button @click="adminView='kelola'" :class="adminView==='kelola' ? 'bg-yellow-400 text-green-900' : ''" class="flex-1 whitespace-nowrap py-2 px-4 rounded-full font-semibold text-sm">Kelola Siswa</button>
-        </div>
-
-        <!-- VIEW DAFTAR SISWA -->
-        <div x-show="adminView==='siswa'" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <template x-for="s in students" :key="s.id">
-                <div class="glass rounded-2xl p-4 flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-full bg-yellow-400 text-green-900 flex items-center justify-center font-bold text-xl" x-text="s.name.charAt(0)"></div>
-                    <div class="flex-1">
-                        <h3 class="font-bold" x-text="s.name"></h3>
-                        <p class="text-xs text-green-100" x-text="s.nis + ' - ' + s.class"></p>
-                    </div>
-                    <div class="text-2xl" x-text="getStudentStatus(s.id)"></div>
-                </div>
-            </template>
-        </div>
-
-        <!-- VIEW CURHAT INBOX -->
-        <div x-show="adminView==='curhat'" class="space-y-4">
-            <template x-for="c in curhats" :key="c.id">
-                <div class="glass rounded-2xl p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <h3 class="font-bold" x-text="getStudentName(c.student_id)"></h3>
-                            <p class="text-xs text-green-100" x-text="new Date(c.created_at).toLocaleString()"></p>
-                        </div>
-                        <span class="text-xs px-2 py-1 rounded-full font-semibold"
-                              :class="c.tingkat_darurat === 'Bantuan' ? 'bg-red-500' : (c.tingkat_darurat === 'Saran' ? 'bg-yellow-400 text-green-900' : 'bg-green-500')"
-                              x-text="c.tingkat_darurat"></span>
-                    </div>
-                    <div class="text-xs text-green-100 mb-2">Kategori: <span x-text="c.kategori + ' - ' + c.sub"></span></div>
-                    <p class="text-sm bg-black/20 p-3 rounded-xl mb-3" x-text="c.cerita"></p>
-                    
-                    <div x-show="!c.balasan">
-                        <textarea x-model="tempReply" class="w-full bg-white/20 rounded-xl p-2 text-sm mb-2" rows="2" placeholder="Tulis balasan..."></textarea>
-                        <button @click="replyCurhat(c.id)" class="bg-yellow-400 text-green-900 px-4 py-2 rounded-lg text-sm font-bold">Kirim Balasan</button>
-                    </div>
-                    <div x-show="c.balasan" class="bg-green-500/30 p-3 rounded-xl">
-                        <p class="text-xs text-yellow-300 font-bold">Balasan Wali:</p>
-                        <p class="text-sm" x-text="c.balasan"></p>
-                    </div>
-                </div>
-            </template>
-        </div>
-
-        <!-- VIEW LAPORAN -->
-        <div x-show="adminView==='laporan'" class="glass rounded-2xl p-4 overflow-x-auto">
-            <div class="flex justify-between mb-4">
-                <h2 class="text-xl font-bold">Laporan Kondisi Siswa</h2>
-                <button @click="exportExcel()" class="bg-green-600 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2">📥 Download Excel</button>
-            </div>
-            <table class="w-full text-sm min-w-[600px]">
-                <thead>
-                    <tr class="border-b border-white/20 text-left">
-                        <th class="p-2">Nama</th>
-                        <th class="p-2">Nilai</th>
-                        <th class="p-2">Sikap</th>
-                        <th class="p-2">Catatan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <template x-for="s in students" :key="s.id">
-                        <tr class="border-b border-white/10">
-                            <td class="p-2" x-text="s.name"></td>
-                            <td class="p-2"><input type="number" x-model="s.nilai" class="w-16 bg-white/10 p-1 rounded"></td>
-                            <td class="p-2">
-                                <select x-model="s.sikap" class="bg-white/10 p-1 rounded">
-                                    <option class="text-black" value="Sangat Baik">Sangat Baik</option>
-                                    <option class="text-black" value="Baik">Baik</option>
-                                    <option class="text-black" value="Cukup">Cukup</option>
-                                    <option class="text-black" value="Kurang">Kurang</option>
-                                </select>
-                            </td>
-                            <td class="p-2"><input type="text" x-model="s.catatan" class="w-full bg-white/10 p-1 rounded"></td>
-                        </tr>
-                    </template>
-                </tbody>
-            </table>
-        </div>
-
-        <!-- VIEW KELOLA SISWA -->
-        <div x-show="adminView==='kelola'" class="space-y-4">
-            <div class="glass rounded-2xl p-4">
-                <h3 class="font-bold mb-3">Tambah Siswa Baru</h3>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-2">
-                    <input type="text" x-model="newStudent.name" placeholder="Nama" class="bg-white/20 p-2 rounded-lg">
-                    <input type="text" x-model="newStudent.nis" placeholder="NIS" class="bg-white/20 p-2 rounded-lg">
-                    <input type="text" x-model="newStudent.class" placeholder="Kelas" class="bg-white/20 p-2 rounded-lg">
-                    <button @click="addStudent()" class="bg-yellow-400 text-green-900 font-bold rounded-lg">Tambah</button>
-                </div>
-            </div>
-            <div class="space-y-2">
-                <template x-for="s in students" :key="s.id">
-                    <div class="glass rounded-xl p-3 flex justify-between items-center">
-                        <span x-text="s.name + ' (' + s.nis + ')'"></span>
-                        <div class="flex gap-2">
-                            <button @click="resetPass(s.id)" class="bg-yellow-400 text-green-900 text-xs px-3 py-1 rounded-lg">Reset PW</button>
-                            <button @click="deleteStudent(s.id)" class="bg-red-500 text-xs px-3 py-1 rounded-lg">Hapus</button>
-                        </div>
-                    </div>
-                </template>
-            </div>
-        </div>
-
-    </div>
-
+<!-- Connection Status -->
+<div id="connectionStatus" class="connection-status online">
+  <i class="fas fa-wifi mr-1"></i> <span id="statusText">Online</span>
 </div>
 
+<!-- ============================================================ -->
+<!-- LOGIN PAGE -->
+<!-- ============================================================ -->
+<div id="loginPage" class="login-container">
+  <div class="login-box">
+    <div class="card-glass p-8 space-y-6 fade-in" style="animation: pulseGlow 4s ease-in-out infinite, fadeIn 0.6s ease-out;">
+      <div class="text-center">
+        <div class="text-5xl mb-3 glow-icon" style="color: var(--purple-bright);"><i class="fas fa-school"></i></div>
+        <h1 class="text-3xl font-bold gradient-text" style="font-family: 'Orbitron', sans-serif;">Wali Digital</h1>
+        <p class="text-sm mt-2" style="color: var(--text-secondary); letter-spacing: 1px;">Sistem Manajemen Siswa</p>
+      </div>
+
+      <div class="flex gap-2">
+        <button id="loginRoleStudent" class="btn flex-1 btn-primary-custom" onclick="setLoginRole('student')">
+          <i class="fas fa-user-graduate mr-2"></i> Siswa
+        </button>
+        <button id="loginRoleWali" class="btn flex-1 btn-ghost" onclick="setLoginRole('wali')">
+          <i class="fas fa-chalkboard-teacher mr-2"></i> Wali
+        </button>
+        <button id="loginRoleAdmin" class="btn flex-1 btn-ghost" onclick="setLoginRole('admin')">
+          <i class="fas fa-user-shield mr-2"></i> Admin
+        </button>
+      </div>
+
+      <div id="studentLoginForm" class="space-y-3">
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-id-badge mr-1"></i> Nama Siswa</span></label>
+          <input id="studentName" type="text" placeholder="Masukkan nama lengkap" class="input input-bordered w-full">
+        </div>
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-layer-group mr-1"></i> Kelas</span></label>
+          <input id="studentClass" type="text" placeholder="Contoh: 7A" class="input input-bordered w-full">
+        </div>
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-lock mr-1"></i> PIN / Password</span></label>
+          <input id="studentPassword" type="password" placeholder="Default: 51sw@qu" class="input input-bordered w-full">
+        </div>
+        <button onclick="loginStudent()" class="btn btn-primary-custom w-full"><i class="fas fa-sign-in-alt mr-2"></i> Masuk sebagai Siswa</button>
+      </div>
+
+      <div id="waliLoginForm" class="space-y-3 hidden">
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-envelope mr-1"></i> Email Wali Kelas</span></label>
+          <input id="waliEmail" type="email" placeholder="email@walikelas.com" class="input input-bordered w-full">
+        </div>
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-lock mr-1"></i> Password</span></label>
+          <input id="waliPassword" type="password" placeholder="Default: d4Rm@app" class="input input-bordered w-full">
+        </div>
+        <button onclick="loginWali()" class="btn btn-primary-custom w-full"><i class="fas fa-sign-in-alt mr-2"></i> Masuk sebagai Wali</button>
+      </div>
+
+      <div id="adminLoginForm" class="space-y-3 hidden">
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-envelope mr-1"></i> Email Admin</span></label>
+          <input id="adminEmail" type="email" placeholder="admin@walidigital.com" class="input input-bordered w-full">
+        </div>
+        <div>
+          <label class="label"><span class="label-text"><i class="fas fa-lock mr-1"></i> Password</span></label>
+          <input id="adminPassword" type="password" placeholder="Default: d4Rm@app" class="input input-bordered w-full">
+        </div>
+        <button onclick="loginAdmin()" class="btn btn-primary-custom w-full"><i class="fas fa-sign-in-alt mr-2"></i> Masuk sebagai Admin</button>
+      </div>
+
+      <div id="loginError" class="text-red-400 text-sm text-center hidden" style="text-shadow: 0 0 10px rgba(248,113,113,0.4);"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DASHBOARD SISWA (SAMA SEPERTI SEBELUMNYA) -->
+<!-- ============================================================ -->
+<div id="studentDashboard" class="p-4 max-w-lg mx-auto hidden" style="padding-bottom: 80px;">
+  <div class="flex justify-between items-center fade-in">
+    <div>
+      <span class="futuristic-badge px-3 py-1 rounded-full"><i class="fas fa-satellite-dish mr-1"></i> Wali Digital</span>
+      <h1 class="text-2xl font-bold mt-2" style="font-family: 'Orbitron', sans-serif;">
+        Halo, <span id="studentNameDisplay" class="gradient-text">Siswa</span> <span>👋</span>
+      </h1>
+    </div>
+    <div class="text-right">
+      <div class="text-xs" style="color: var(--text-muted);" id="dateDisplay">Senin, 11 Jul 2026</div>
+      <div class="text-2xl font-mono font-bold" style="color: #fff; text-shadow: 0 0 15px rgba(255,255,255,0.3);" id="clockDisplay">12:00</div>
+    </div>
+  </div>
+
+  <div class="motivation-box text-center text-sm mt-4 rounded-full py-2.5 px-5" style="color: #e0d4ff;">
+    <i class="fas fa-quote-left mr-1 icon-purple" style="opacity:0.5;"></i> <span id="motivationText">Jadilah versi terbaik dari dirimu hari ini.</span>
+  </div>
+
+  <div class="flex justify-end mt-2">
+    <button onclick="logout()" class="btn btn-sm btn-ghost" style="color: var(--red-bright);"><i class="fas fa-power-off mr-1"></i> Keluar</button>
+  </div>
+
+  <div id="studentContent" class="space-y-5 mt-4">
+    <!-- Peta Potensi -->
+    <div id="potensiCard" class="card-glass p-5 space-y-3 fade-in">
+      <div class="flex items-center gap-2">
+        <i class="fas fa-compass icon-purple text-xl"></i>
+        <span class="font-bold text-lg" style="letter-spacing: 0.5px;">Peta Potensi</span>
+      </div>
+      <div id="potensiForm">
+        <div class="grid grid-cols-2 gap-2 text-sm">
+          <div><label class="block text-xs font-medium" style="color: var(--text-secondary);"><i class="fas fa-heart mr-1" style="color:var(--red-bright);"></i> Minat</label><select id="minat" class="select select-bordered select-sm w-full"><option>Olahraga</option><option>Seni</option><option>Sains</option><option>Teknologi</option><option>Bahasa</option><option>Lainnya</option></select></div>
+          <div><label class="block text-xs font-medium" style="color: var(--text-secondary);"><i class="fas fa-brain mr-1 icon-purple"></i> Gaya Belajar</label><select id="gayaBelajar" class="select select-bordered select-sm w-full"><option>Visual</option><option>Auditori</option><option>Kinestetik</option><option>Baca/Tulis</option></select></div>
+        </div>
+        <div><label class="block text-xs font-medium mt-2" style="color: var(--text-secondary);"><i class="fas fa-rocket mr-1 icon-blue"></i> Cita-cita</label><input id="citaCita" type="text" placeholder="Cita-citamu" class="input input-bordered input-sm w-full"></div>
+        <div><label class="block text-xs font-medium mt-2" style="color: var(--text-secondary);"><i class="fas fa-gem mr-1 icon-purple"></i> Kekuatan Karakter</label><select id="karakter" class="select select-bordered select-sm w-full"><option>Pemberani</option><option>Baik Hati</option><option>Kreatif</option><option>Pantang Menyerah</option><option>Disiplin</option><option>Pemimpin</option><option>Jujur</option></select></div>
+        <div><label class="block text-xs font-medium mt-2" style="color: var(--text-secondary);"><i class="fas fa-futbol mr-1 icon-blue"></i> Ekstrakurikuler</label><input id="ekskul" type="text" placeholder="Kegiatan ekstra" class="input input-bordered input-sm w-full"></div>
+        <button id="simpanPotensi" class="btn btn-primary-custom btn-sm w-full mt-3"><i class="fas fa-database mr-1"></i> Simpan Peta Potensi</button>
+      </div>
+      <div id="potensiDone" class="hidden font-semibold" style="color: #4ade80; text-shadow: 0 0 10px rgba(74,222,128,0.3);"><i class="fas fa-check-circle"></i> Peta Potensi Sudah Diisi</div>
+    </div>
+
+    <!-- Fitur Aksi -->
+    <div class="grid grid-cols-2 gap-3 fade-in">
+      <div class="card-glass p-4 text-center cursor-pointer" onclick="openModal('perbuatanBaikModal')">
+        <i class="fas fa-star text-3xl icon-yellow"></i>
+        <div class="font-bold text-sm mt-2" style="letter-spacing: 0.3px;">Perbuatan Baik</div>
+        <div id="perbuatanStatus" class="text-xs mt-1" style="color: var(--text-muted);">Klik untuk catat</div>
+      </div>
+      <div class="card-glass p-4 text-center cursor-pointer" onclick="openModal('curhatModal')">
+        <i class="fas fa-comment-dots text-3xl icon-purple"></i>
+        <div class="font-bold text-sm mt-2" style="letter-spacing: 0.3px;">Curhat</div>
+        <div class="text-xs mt-1" style="color: var(--text-muted);">Ceritakan</div>
+      </div>
+      <div class="card-glass p-4 text-center cursor-pointer" onclick="openModal('jurnalModal')">
+        <i class="fas fa-book-open text-3xl icon-blue"></i>
+        <div class="font-bold text-sm mt-2" style="letter-spacing: 0.3px;">Jurnal Harian</div>
+        <div class="text-xs mt-1" style="color: var(--text-muted);">Catat perasaan</div>
+      </div>
+      <div class="card-glass p-4 text-center cursor-pointer" onclick="showRiwayat()">
+        <i class="fas fa-history text-3xl icon-red"></i>
+        <div class="font-bold text-sm mt-2" style="letter-spacing: 0.3px;">Riwayat Curhat</div>
+        <div class="text-xs mt-1" style="color: var(--text-muted);">Balasan</div>
+      </div>
+    </div>
+
+    <!-- Aktivitas Terakhir -->
+    <div class="card-glass p-4 fade-in">
+      <div class="flex justify-between">
+        <span class="font-bold"><i class="fas fa-bolt icon-yellow mr-2"></i>Aktivitas Terakhir</span>
+        <span class="text-xs" style="color: var(--text-muted);">hari ini</span>
+      </div>
+      <div id="recentActivity" class="text-sm mt-2" style="color: var(--text-secondary);">Belum ada aktivitas.</div>
+    </div>
+  </div>
+
+  <!-- Bottom Nav -->
+  <div class="bottom-nav">
+    <button class="nav-btn active" onclick="navigateTo('home')"><i class="fas fa-home"></i><span>Beranda</span></button>
+    <button class="nav-btn" onclick="navigateTo('curhat')"><i class="fas fa-comment"></i><span>Curhat</span></button>
+    <button class="nav-btn" onclick="navigateTo('jurnal')"><i class="fas fa-pen-fancy"></i><span>Jurnal</span></button>
+    <button class="nav-btn" onclick="navigateTo('profil')"><i class="fas fa-user-astronaut"></i><span>Profil</span></button>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DASHBOARD WALI KELAS -->
+<!-- ============================================================ -->
+<div id="waliDashboard" class="p-4 max-w-lg mx-auto hidden" style="padding-bottom: 80px;">
+  <div class="flex justify-between items-center fade-in">
+    <div>
+      <span class="futuristic-badge px-3 py-1 rounded-full"><i class="fas fa-satellite-dish mr-1"></i> Wali Digital</span>
+      <h1 class="text-2xl font-bold mt-2" style="font-family: 'Orbitron', sans-serif;">
+        <i class="fas fa-chalkboard-teacher mr-2 icon-purple"></i>Dashboard Wali
+      </h1>
+      <p class="text-sm mt-1" style="color: var(--text-secondary);">Selamat datang, <span id="waliNameDisplay" class="gradient-text">Wali Kelas</span></p>
+    </div>
+    <button onclick="logout()" class="btn btn-sm btn-ghost" style="color: var(--red-bright);"><i class="fas fa-power-off mr-1"></i> Keluar</button>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3 mt-4 fade-in">
+    <div class="card-glass p-3 text-center stat-card stat-blue">
+      <div class="text-2xl font-bold" style="color: var(--blue-cyan); text-shadow: 0 0 18px rgba(0,187,255,0.4);" id="totalSiswa">0</div>
+      <div class="text-xs mt-1" style="color: var(--text-muted);"><i class="fas fa-users mr-1"></i>Total Siswa</div>
+    </div>
+    <div class="card-glass p-3 text-center stat-card stat-red">
+      <div class="text-2xl font-bold" style="color: var(--red-bright); text-shadow: 0 0 18px var(--red-glow);" id="curhatDarurat">0</div>
+      <div class="text-xs mt-1" style="color: var(--text-muted);"><i class="fas fa-exclamation-triangle mr-1"></i>Darurat</div>
+    </div>
+    <div class="card-glass p-3 text-center stat-card stat-yellow">
+      <div class="text-2xl font-bold" style="color: #fde047; text-shadow: 0 0 18px rgba(253,224,71,0.35);" id="curhatBelumDibaca">0</div>
+      <div class="text-xs mt-1" style="color: var(--text-muted);"><i class="fas fa-envelope mr-1"></i>Belum Dibaca</div>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mt-5 border-b" style="border-color: rgba(139, 92, 246, 0.12) !important;">
+    <button id="tabSiswa" class="px-4 py-2 text-sm font-medium tab-active" onclick="switchWaliTab('siswa')">
+      <i class="fas fa-users mr-1"></i> Siswa
+    </button>
+    <button id="tabCurhat" class="px-4 py-2 text-sm font-medium" style="color: var(--text-muted);" onclick="switchWaliTab('curhat')">
+      <i class="fas fa-inbox mr-1"></i> Curhat
+    </button>
+    <button id="tabLaporan" class="px-4 py-2 text-sm font-medium" style="color: var(--text-muted);" onclick="switchWaliTab('laporan')">
+      <i class="fas fa-chart-bar mr-1"></i> Laporan
+    </button>
+  </div>
+
+  <div id="tabSiswaContent" class="mt-4 fade-in">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-bold"><i class="fas fa-address-book icon-purple mr-2"></i> Daftar Siswa</h3>
+      <button onclick="showTambahSiswa()" class="btn btn-primary-custom btn-sm">
+        <i class="fas fa-user-plus mr-1"></i> Tambah
+      </button>
+    </div>
+    <div id="studentList" class="space-y-2"></div>
+  </div>
+
+  <div id="tabCurhatContent" class="mt-4 hidden">
+    <h3 class="font-bold"><i class="fas fa-inbox icon-purple mr-2"></i> Inbox Curhat</h3>
+    <div id="curhatInbox" class="space-y-2 mt-3"></div>
+  </div>
+
+  <div id="tabLaporanContent" class="mt-4 hidden">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-bold"><i class="fas fa-chart-bar icon-green mr-2"></i> Laporan Lengkap Siswa</h3>
+      <button onclick="exportLaporan()" class="btn btn-success-custom btn-sm">
+        <i class="fas fa-file-excel mr-1"></i> Export Excel
+      </button>
+    </div>
+    <div id="laporanList" class="space-y-3"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- DASHBOARD ADMIN SUPER -->
+<!-- ============================================================ -->
+<div id="adminDashboard" class="p-4 max-w-lg mx-auto hidden" style="padding-bottom: 80px;">
+  <div class="flex justify-between items-center fade-in">
+    <div>
+      <span class="futuristic-badge px-3 py-1 rounded-full"><i class="fas fa-crown mr-1"></i> Super Admin</span>
+      <h1 class="text-2xl font-bold mt-2" style="font-family: 'Orbitron', sans-serif;">
+        <i class="fas fa-user-shield mr-2 icon-purple"></i>Dashboard Admin
+      </h1>
+      <p class="text-sm mt-1" style="color: var(--text-secondary);">Selamat datang, <span id="adminNameDisplay" class="gradient-text">Admin Super</span></p>
+    </div>
+    <button onclick="logout()" class="btn btn-sm btn-ghost" style="color: var(--red-bright);"><i class="fas fa-power-off mr-1"></i> Keluar</button>
+  </div>
+
+  <div class="grid grid-cols-3 gap-3 mt-4 fade-in">
+    <div class="card-glass p-3 text-center stat-card stat-blue">
+      <div class="text-2xl font-bold" style="color: var(--blue-cyan); text-shadow: 0 0 18px rgba(0,187,255,0.4);" id="totalWali">0</div>
+      <div class="text-xs mt-1" style="color: var(--text-muted);"><i class="fas fa-chalkboard-teacher mr-1"></i>Total Wali</div>
+    </div>
+    <div class="card-glass p-3 text-center stat-card stat-purple">
+      <div class="text-2xl font-bold" style="color: var(--purple-bright); text-shadow: 0 0 18px var(--purple-glow);" id="totalSiswaAdmin">0</div>
+      <div class="text-xs mt-1" style="color: var(--text-muted);"><i class="fas fa-users mr-1"></i>Total Siswa</div>
+    </div>
+    <div class="card-glass p-3 text-center stat-card stat-yellow">
+      <div class="text-2xl font-bold" style="color: #fde047; text-shadow: 0 0 18px rgba(253,224,71,0.35);" id="totalCurhatAdmin">0</div>
+      <div class="text-xs mt-1" style="color: var(--text-muted);"><i class="fas fa-comment mr-1"></i>Total Curhat</div>
+    </div>
+  </div>
+
+  <div class="flex gap-2 mt-5 border-b" style="border-color: rgba(139, 92, 246, 0.12) !important;">
+    <button id="adminTabWali" class="px-4 py-2 text-sm font-medium tab-active" onclick="switchAdminTab('wali')">
+      <i class="fas fa-chalkboard-teacher mr-1"></i> Kelola Wali
+    </button>
+    <button id="adminTabSiswa" class="px-4 py-2 text-sm font-medium" style="color: var(--text-muted);" onclick="switchAdminTab('siswa')">
+      <i class="fas fa-users mr-1"></i> Semua Siswa
+    </button>
+    <button id="adminTabStatistik" class="px-4 py-2 text-sm font-medium" style="color: var(--text-muted);" onclick="switchAdminTab('statistik')">
+      <i class="fas fa-chart-pie mr-1"></i> Statistik
+    </button>
+  </div>
+
+  <div id="adminTabWaliContent" class="mt-4 fade-in">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="font-bold"><i class="fas fa-user-plus icon-green mr-2"></i> Daftar Wali Kelas</h3>
+      <button onclick="showTambahWali()" class="btn btn-primary-custom btn-sm">
+        <i class="fas fa-plus mr-1"></i> Tambah Wali
+      </button>
+    </div>
+    <div id="waliList" class="space-y-2"></div>
+  </div>
+
+  <div id="adminTabSiswaContent" class="mt-4 hidden">
+    <h3 class="font-bold"><i class="fas fa-address-book icon-purple mr-2"></i> Semua Siswa</h3>
+    <div id="allStudentsList" class="space-y-2 mt-3"></div>
+  </div>
+
+  <div id="adminTabStatistikContent" class="mt-4 hidden">
+    <h3 class="font-bold"><i class="fas fa-chart-pie icon-blue mr-2"></i> Statistik Sekolah</h3>
+    <div id="statistikContent" class="space-y-3 mt-3"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL-MODAL -->
+<!-- ============================================================ -->
+
+<!-- MODAL DETAIL SISWA -->
+<input type="checkbox" id="detailSiswaModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box max-w-md">
+    <label for="detailSiswaModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-user-graduate icon-purple mr-2"></i> <span id="detailSiswaNama">Nama Siswa</span></h3>
+    <div class="divider"></div>
+    <div class="flex gap-2 border-b mb-3" style="border-color: rgba(139, 92, 246, 0.12) !important;">
+      <button class="px-3 py-1 text-xs font-medium tab-active" onclick="switchDetailTab('profil')" id="detailTabProfil"><i class="fas fa-id-card mr-1"></i>Profil</button>
+      <button class="px-3 py-1 text-xs font-medium" style="color: var(--text-muted);" onclick="switchDetailTab('potensi')" id="detailTabPotensi"><i class="fas fa-compass mr-1"></i>Potensi</button>
+      <button class="px-3 py-1 text-xs font-medium" style="color: var(--text-muted);" onclick="switchDetailTab('aktivitas')" id="detailTabAktivitas"><i class="fas fa-bolt mr-1"></i>Aktivitas</button>
+      <button class="px-3 py-1 text-xs font-medium" style="color: var(--text-muted);" onclick="switchDetailTab('curhat')" id="detailTabCurhat"><i class="fas fa-comment-dots mr-1"></i>Curhat</button>
+    </div>
+    <div id="detailProfil" class="space-y-2 text-sm">
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-hashtag mr-1"></i>NIS</span><span id="dNIS" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-layer-group mr-1"></i>Kelas</span><span id="dKelas" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-signal mr-1"></i>Status</span><span id="dStatus" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-calendar mr-1"></i>Bergabung</span><span id="dBergabung" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-chalkboard-teacher mr-1"></i>Wali Kelas</span><span id="dWaliName" class="font-medium">-</span></div>
+    </div>
+    <div id="detailPotensi" class="hidden space-y-2 text-sm">
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-heart mr-1" style="color:var(--red-bright);"></i>Minat</span><span id="dMinat" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-brain mr-1 icon-purple"></i>Gaya Belajar</span><span id="dGayaBelajar" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-rocket mr-1 icon-blue"></i>Cita-cita</span><span id="dCitaCita" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-gem mr-1 icon-purple"></i>Kekuatan Karakter</span><span id="dKarakter" class="font-medium">-</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-futbol mr-1 icon-blue"></i>Ekstrakurikuler</span><span id="dEkskul" class="font-medium">-</span></div>
+    </div>
+    <div id="detailAktivitas" class="hidden space-y-2 text-sm">
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-star mr-1"></i>Total Perbuatan Baik</span><span id="dTotalBaik" class="font-medium" style="color: #fde047;">0</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-book mr-1"></i>Total Jurnal</span><span id="dTotalJurnal" class="font-medium" style="color: var(--blue-cyan);">0</span></div>
+      <div class="flex justify-between"><span style="color: var(--text-muted);"><i class="fas fa-comment mr-1"></i>Total Curhat</span><span id="dTotalCurhat" class="font-medium" style="color: var(--purple-bright);">0</span></div>
+      <div class="mt-3">
+        <div class="text-xs font-medium" style="color: var(--text-muted);"><i class="fas fa-book-open mr-1"></i>Jurnal Terakhir:</div>
+        <div id="dJurnalTerakhir" class="p-2 rounded-lg text-xs mt-1" style="background: rgba(139, 92, 246, 0.08); border: 1px solid rgba(139, 92, 246, 0.1);">Belum ada jurnal</div>
+      </div>
+      <div class="mt-2">
+        <div class="text-xs font-medium" style="color: var(--text-muted);"><i class="fas fa-star mr-1"></i>Perbuatan Baik Terakhir:</div>
+        <div id="dPerbuatanTerakhir" class="p-2 rounded-lg text-xs mt-1" style="background: rgba(253,224,71,0.08); border: 1px solid rgba(253,224,71,0.1);">Belum ada</div>
+      </div>
+    </div>
+    <div id="detailCurhat" class="hidden space-y-2 text-sm max-h-60 overflow-y-auto">
+      <div id="dCurhatList" class="space-y-2"><div class="text-center" style="color: var(--text-muted);">Belum ada curhat</div></div>
+    </div>
+    <div class="modal-action">
+      <label for="detailSiswaModal" class="btn btn-ghost btn-sm">Tutup</label>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PERBUATAN BAIK -->
+<input type="checkbox" id="perbuatanBaikModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box relative">
+    <label for="perbuatanBaikModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-star icon-yellow mr-2"></i>Perbuatan Baik Hari Ini</h3>
+    <div class="grid grid-cols-2 gap-2 mt-4">
+      <button class="btn btn-outline btn-sm" onclick="catatPerbuatan('Aku membantu teman')"><i class="fas fa-handshake mr-1 icon-green"></i> Membantu teman</button>
+      <button class="btn btn-outline btn-sm" onclick="catatPerbuatan('Aku berbagi makanan')"><i class="fas fa-utensils mr-1 icon-yellow"></i> Berbagi makanan</button>
+      <button class="btn btn-outline btn-sm" onclick="catatPerbuatan('Aku menjaga kebersihan')"><i class="fas fa-broom mr-1 icon-blue"></i> Menjaga kebersihan</button>
+      <button class="btn btn-outline btn-sm" onclick="catatPerbuatan('Aku berkata jujur')"><i class="fas fa-comment mr-1 icon-purple"></i> Berkata jujur</button>
+    </div>
+    <div class="mt-3"><input id="perbuatanLain" placeholder="Tulis perbuatan baik lainnya..." class="input input-bordered w-full input-sm"/><button class="btn btn-primary-custom btn-sm mt-2 w-full" onclick="catatPerbuatan(document.getElementById('perbuatanLain').value || 'Lainnya')"><i class="fas fa-plus mr-1"></i> Catat</button></div>
+    <div id="perbuatanFeedback" class="mt-3 text-center font-semibold" style="color: var(--purple-bright); text-shadow: 0 0 12px var(--purple-glow);"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL CURHAT (DIPERBAIKI) -->
+<!-- ============================================================ -->
+<input type="checkbox" id="curhatModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box relative max-w-md">
+    <label for="curhatModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-comment-dots icon-purple mr-2"></i>Curhat</h3>
+    <div id="curhatFlow" class="chat-container mt-3 space-y-1"></div>
+    <div id="curhatOptions" class="flex flex-wrap gap-2 mt-2"></div>
+    <div id="curhatTextArea" class="hidden mt-2">
+      <textarea id="curhatCerita" class="textarea textarea-bordered w-full" placeholder="Ceritakan..." rows="2"></textarea>
+      <button id="curhatSubmit" class="btn btn-primary-custom btn-sm mt-2 w-full"><i class="fas fa-paper-plane mr-1"></i> Kirim Curhat</button>
+    </div>
+    <div id="curhatResult" class="font-semibold mt-2 hidden" style="color: #4ade80; text-shadow: 0 0 10px rgba(74,222,128,0.3);"><i class="fas fa-check-circle"></i> Terima kasih sudah curhat, sabar ya menunggu balasan dari Wali.</div>
+    <!-- Area untuk balasan berlapis -->
+    <div id="curhatReplyArea" class="hidden mt-3">
+      <div class="divider text-xs" style="color: var(--text-muted);">💬 Balas</div>
+      <div id="curhatReplies" class="space-y-2 max-h-60 overflow-y-auto"></div>
+      <div class="flex gap-2 mt-2">
+        <input id="curhatReplyInput" type="text" class="input input-bordered flex-1 input-sm" placeholder="Tulis balasan..." />
+        <button id="curhatReplyButton" onclick="sendCurhatReply()" class="btn btn-primary-custom btn-sm"><i class="fas fa-paper-plane"></i></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL JURNAL -->
+<input type="checkbox" id="jurnalModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <label for="jurnalModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-book-open icon-blue mr-2"></i>Jurnal Harian</h3>
+    <div class="mt-3">
+      <label class="block text-sm" style="color: var(--text-secondary);"><i class="fas fa-smile mr-1"></i> Bagaimana perasaanmu hari ini?</label>
+      <div class="flex gap-3 text-3xl my-3">
+        <span class="cursor-pointer transition-transform hover:scale-125" onclick="pilihEmoji('😊')">😊</span>
+        <span class="cursor-pointer transition-transform hover:scale-125" onclick="pilihEmoji('😐')">😐</span>
+        <span class="cursor-pointer transition-transform hover:scale-125" onclick="pilihEmoji('😢')">😢</span>
+        <span class="cursor-pointer transition-transform hover:scale-125" onclick="pilihEmoji('😡')">😡</span>
+        <span class="cursor-pointer transition-transform hover:scale-125" onclick="pilihEmoji('😴')">😴</span>
+      </div>
+      <input id="jurnalEmoji" type="hidden" value="😊">
+      <textarea id="jurnalCerita" class="textarea textarea-bordered w-full" placeholder="Ceritakan harimu..." rows="2"></textarea>
+      <button onclick="simpanJurnal()" class="btn btn-primary-custom btn-sm w-full mt-2"><i class="fas fa-save mr-1"></i> Simpan Jurnal</button>
+      <div id="jurnalFeedback" class="text-sm mt-1" style="color: #4ade80; text-shadow: 0 0 10px rgba(74,222,128,0.3);"></div>
+    </div>
+    <div class="mt-3 text-xs" style="color: var(--text-muted);"><i class="fas fa-calendar-alt mr-1"></i> Riwayat jurnal</div>
+    <div id="miniJurnal" class="text-xs space-y-1 max-h-32 overflow-y-auto"></div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- MODAL RIWAYAT CURHAT (DIPERBAIKI) -->
+<!-- ============================================================ -->
+<div id="riwayatPanel" class="fixed inset-0 flex items-center justify-center z-50 hidden" style="background: rgba(0,0,30,0.5); backdrop-filter: blur(8px);" onclick="if(event.target===this) closeRiwayat()">
+  <div class="rounded-3xl p-5 max-w-sm w-full max-h-[80vh] overflow-y-auto" style="background: rgba(0, 18, 70, 0.92); backdrop-filter: blur(24px); border: var(--border-glow); box-shadow: 0 0 70px rgba(139, 92, 246, 0.12), 0 25px 60px rgba(0, 0, 0, 0.3);">
+    <div class="flex justify-between"><span class="font-bold"><i class="fas fa-history icon-red mr-2"></i>Riwayat Curhat</span><button onclick="closeRiwayat()" class="btn btn-sm btn-ghost">✕</button></div>
+    <div id="riwayatList" class="space-y-3 mt-3 text-sm"></div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH SISWA -->
+<input type="checkbox" id="tambahSiswaModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <label for="tambahSiswaModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-user-plus icon-green mr-2"></i>Tambah Siswa</h3>
+    <div class="space-y-3 mt-4">
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-hashtag mr-1"></i> NIS <span class="text-red-400">*</span>
+        </label>
+        <input id="siswaNIS" class="input input-bordered w-full" placeholder="Masukkan NIS" value="">
+      </div>
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-user mr-1"></i> Nama Lengkap <span class="text-red-400">*</span>
+        </label>
+        <input id="siswaNama" class="input input-bordered w-full" placeholder="Masukkan nama lengkap" value="">
+      </div>
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-layer-group mr-1"></i> Kelas <span class="text-red-400">*</span>
+        </label>
+        <input id="siswaKelas" class="input input-bordered w-full" placeholder="Contoh: 7A" value="">
+      </div>
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-lock mr-1"></i> PIN (Default: 51sw@qu)
+        </label>
+        <input id="siswaPIN" class="input input-bordered w-full" placeholder="51sw@qu" value="51sw@qu">
+      </div>
+      <button onclick="tambahSiswa()" class="btn btn-primary-custom w-full mt-2">
+        <i class="fas fa-save mr-2"></i> Simpan Siswa
+      </button>
+      <button onclick="document.getElementById('tambahSiswaModal').checked = false" class="btn btn-ghost w-full">
+        Batal
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL TAMBAH WALI -->
+<input type="checkbox" id="tambahWaliModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <label for="tambahWaliModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-user-plus icon-purple mr-2"></i>Tambah Wali Kelas</h3>
+    <div class="space-y-3 mt-4">
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-user mr-1"></i> Nama Wali <span class="text-red-400">*</span>
+        </label>
+        <input id="waliNama" class="input input-bordered w-full" placeholder="Contoh: Wali Kelas 7A" value="">
+      </div>
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-envelope mr-1"></i> Email <span class="text-red-400">*</span>
+        </label>
+        <input id="waliEmailBaru" type="email" class="input input-bordered w-full" placeholder="wali7a@walidigital.com" value="">
+      </div>
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-layer-group mr-1"></i> Kelas <span class="text-red-400">*</span>
+        </label>
+        <input id="waliKelas" class="input input-bordered w-full" placeholder="Contoh: 7A" value="">
+      </div>
+      <div>
+        <label class="block text-sm font-medium" style="color: var(--text-secondary);">
+          <i class="fas fa-lock mr-1"></i> Password (Default: d4Rm@app)
+        </label>
+        <input id="waliPasswordBaru" class="input input-bordered w-full" placeholder="d4Rm@app" value="d4Rm@app">
+      </div>
+      <button onclick="tambahWali()" class="btn btn-primary-custom w-full mt-2">
+        <i class="fas fa-save mr-2"></i> Simpan Wali
+      </button>
+      <button onclick="document.getElementById('tambahWaliModal').checked = false" class="btn btn-ghost w-full">
+        Batal
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL BALAS CURHAT (WALI) -->
+<input type="checkbox" id="balasCurhatModal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <label for="balasCurhatModal" class="btn btn-sm btn-circle absolute right-2 top-2">✕</label>
+    <h3 class="font-bold text-lg"><i class="fas fa-reply icon-purple mr-2"></i>Balas Curhat</h3>
+    <div class="mt-3">
+      <div class="p-3 rounded-lg text-sm" style="background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.15);" id="curhatDetail"></div>
+      
+      <!-- Riwayat Balasan -->
+      <div id="curhatDetailReplies" class="mt-3 space-y-2 max-h-40 overflow-y-auto"></div>
+      
+      <textarea id="balasanText" class="textarea textarea-bordered w-full mt-3" rows="3" placeholder="Tulis balasan..."></textarea>
+      <button onclick="kirimBalasan()" class="btn btn-primary-custom w-full mt-2"><i class="fas fa-paper-plane mr-2"></i> Kirim Balasan</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================ -->
+<!-- JAVASCRIPT -->
+<!-- ============================================================ -->
 <script>
-function dWaliApp() {
-    return {
-        // STATE
-        isLoggedIn: false,
-        role: 'student',
-        loginRole: 'student',
-        loginForm: { name: 'Budi', class: '7A', pin: '51sw@qu', email: 'wali@dwali.com', pass: 'd4Rm@app*' },
-        currentUser: null,
-        
-        // VIEWS
-        studentView: 'dashboard',
-        adminView: 'siswa',
-        activeModal: null,
-        notif: { show: false, text: '' },
+// ============================================================
+// KONFIGURASI
+// ============================================================
+const CONFIG = {
+  API_URL: 'https://script.google.com/macros/s/AKfycbwgM8n1FaHP15k4yTYNFpbJ6O5c_5lHH-Y1LHcCSjJpjr3eA0HWgWeZZrc8fMouc4E/exec',
+  USE_API: false,
+  STORAGE_KEY: 'waliDigitalData'
+};
 
-        // DATA
-        students: [
-            { id: 's1', name: 'Budi', nis: '12345', class: '7A', is_potensi_filled: false, perbuatan_baik_today: false, nilai: 85, sikap: 'Baik', catatan: 'Aktif', potensi: {} },
-            { id: 's2', name: 'Siti', nis: '12346', class: '7A', is_potensi_filled: true, perbuatan_baik_today: true, nilai: 90, sikap: 'Sangat Baik', catatan: 'Rajin', potensi: {} }
-        ],
-        curhats: [
-            { id: 'c1', student_id: 's2', untuk: 'Aku sendiri', kategori: 'Sekolah', sub: 'Pelajaran', tingkat_darurat: 'Saran', cerita: 'Saya kesulitan matematika pak', is_read: false, balasan: 'Nanti saya bantu belajar sore ya.', created_at: new Date().toISOString() }
-        ],
-        
-        // FORMS
-        potensiForm: { minat: '', gaya: '', cita_cita: '', karakter: '', ekskul: '' },
-        jurnalForm: { perasaan: '', cerita: '' },
-        newStudent: { name: '', nis: '', class: '' },
-        tempReply: '',
-
-        // CURHAT FLOW
-        curhatStep: 0,
-        curhatChat: [],
-        curhatForm: { untuk: '', kategori: '', sub: '', darurat: '', cerita: '' },
-
-        // SYNC CONFIG
-        SHEET_URL: 'https://script.google.com/macros/s/AKfycbx29OyQqaNrlO6nx_tPMNvVzut6xppzZ6RKKWvsDWbUwdUBgiVxMk_vIO4Ih4qmJ0pX/exec', // GANTI DENGAN URL KAMU
-        isSyncing: false,
-
-        // ============ INIT ============
-        init() {
-            this.loadFromSheet();
-        },
-
-        // ============ SYNC FUNCTIONS ============
-        async loadFromSheet() {
-            try {
-                this.showNotif('⏳ Loading data...');
-                
-                const studentResponse = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getStudents' })
-                });
-                
-                const studentData = await studentResponse.json();
-                if (studentData.status === 'success' && studentData.data.length > 0) {
-                    this.students = studentData.data;
-                }
-                
-                const curhatResponse = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'getCurhats' })
-                });
-                
-                const curhatData = await curhatResponse.json();
-                if (curhatData.status === 'success') {
-                    this.curhats = curhatData.data || [];
-                }
-                
-                this.showNotif('✅ Data loaded from spreadsheet!');
-                
-            } catch(error) {
-                console.error('Load error:', error);
-                this.showNotif('⚠️ Gagal load data, pakai data lokal');
-            }
-        },
-
-        async syncStudentToSheet(student) {
-            try {
-                const response = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'saveStudent',
-                        student: student
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    console.log('Student synced:', student.name);
-                }
-            } catch(error) {
-                console.error('Sync error:', error);
-            }
-        },
-
-        async syncCurhatToSheet(curhat) {
-            try {
-                const response = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'saveCurhat',
-                        curhat: curhat
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    console.log('Curhat synced');
-                }
-            } catch(error) {
-                console.error('Sync error:', error);
-            }
-        },
-
-        async syncReplyToSheet(curhatId, balasan) {
-            try {
-                const response = await fetch(this.SHEET_URL, {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'replyCurhat',
-                        curhatId: curhatId,
-                        balasan: balasan
-                    })
-                });
-                
-                const result = await response.json();
-                if (result.status === 'success') {
-                    console.log('Reply synced');
-                }
-            } catch(error) {
-                console.error('Sync error:', error);
-            }
-        },
-
-        async syncAllStudents() {
-            for (let student of this.students) {
-                await this.syncStudentToSheet(student);
-            }
-            this.showNotif('✅ Semua data tersinkronisasi!');
-        },
-
-        // ============ AUTH ============
-        loginStudent() {
-            if(this.loginForm.pin === '51sw@qu') {
-                let student = this.students.find(s => 
-                    s.name.toLowerCase() === this.loginForm.name.toLowerCase() && 
-                    s.class.toLowerCase() === this.loginForm.class.toLowerCase()
-                );
-                if(!student) {
-                    student = { 
-                        id: 's'+Date.now(), 
-                        name: this.loginForm.name, 
-                        nis: 'NEW', 
-                        class: this.loginForm.class, 
-                        is_potensi_filled: false, 
-                        perbuatan_baik_today: false, 
-                        nilai: 0, 
-                        sikap: 'Baik', 
-                        catatan: '',
-                        potensi: {}
-                    };
-                    this.students.push(student);
-                    this.syncStudentToSheet(student);
-                }
-                this.currentUser = student;
-                this.isLoggedIn = true;
-                this.role = 'student';
-                this.studentView = student.is_potensi_filled ? 'dashboard' : 'potensi';
-            } else {
-                this.showNotif('PIN/Password salah!');
-            }
-        },
-
-        loginAdmin() {
-            if(this.loginForm.pass === 'd4Rm@app*') {
-                this.currentUser = { name: 'Pak Wali 7A' };
-                this.isLoggedIn = true;
-                this.role = 'admin';
-            } else {
-                this.showNotif('Password Wali salah!');
-            }
-        },
-
-        logout() {
-            this.isLoggedIn = false;
-            this.currentUser = null;
-        },
-
-        // ============ STUDENT FEATURES ============
-        savePotensi() {
-            this.currentUser.is_potensi_filled = true;
-            this.currentUser.potensi = this.potensiForm;
-            let idx = this.students.findIndex(s => s.id === this.currentUser.id);
-            this.students[idx] = this.currentUser;
-            this.studentView = 'dashboard';
-            this.syncStudentToSheet(this.currentUser);
-            this.showNotif('✅ Peta Potensi Tersimpan!');
-        },
-
-        savePerbuatanBaik(act) {
-            this.currentUser.perbuatan_baik_today = true;
-            let idx = this.students.findIndex(s => s.id === this.currentUser.id);
-            this.students[idx] = this.currentUser;
-            this.activeModal = null;
-            this.syncStudentToSheet(this.currentUser);
-            const praises = ["🌟 Good Job! Kamu hebat!", "💪 Luar biasa! Pertahankan ya!", "😇 Kamu anak baik!"];
-            this.showNotif(praises[Math.floor(Math.random() * praises.length)]);
-        },
-
-        saveJurnal() {
-            this.activeModal = null;
-            this.jurnalForm = { perasaan: '', cerita: '' };
-            this.showNotif('✅ Jurnal Harian Tersimpan!');
-        },
-
-        // ============ CURHAT ============
-        openModal(type) {
-            this.activeModal = type;
-            if(type === 'curhat') {
-                this.curhatStep = 1;
-                this.curhatChat = [{ type: 'bot', text: 'Siapakah kamu?' }];
-                this.curhatForm = { untuk: '', kategori: '', sub: '', darurat: '', cerita: '' };
-            }
-        },
-
-        answerCurhat(field, value) {
-            this.curhatForm[field] = value;
-            this.curhatChat.push({ type: 'user', text: value });
-            
-            if(field === 'untuk') { 
-                this.curhatStep = 2; 
-                this.curhatChat.push({ type: 'bot', text: 'Kategori, apakah ini masalah di rumah atau di sekolah?' }); 
-            } else if(field === 'kategori') { 
-                this.curhatStep = 3; 
-                this.curhatChat.push({ type: 'bot', text: `Masalah di ${value}?` }); 
-            } else if(field === 'sub') { 
-                this.curhatStep = 4; 
-                this.curhatChat.push({ type: 'bot', text: 'Tingkat Darurat?' }); 
-            } else if(field === 'darurat') {
-                this.curhatStep = 5;
-                let msg = 'Masalahnya apa? Ceritakan bebas ya.';
-                if(value === 'Bantuan') msg = '⚠️ Kami akan segera menghubungimu! Tetap tenang ya. Tapi ceritakan dulu apa yang terjadi.';
-                this.curhatChat.push({ type: 'bot', text: msg });
-            }
-        },
-
-        submitCurhat() {
-            const newCurhat = {
-                id: 'c'+Date.now(),
-                student_id: this.currentUser.id,
-                ...this.curhatForm,
-                tingkat_darurat: this.curhatForm.darurat,
-                is_read: false,
-                balasan: null,
-                created_at: new Date().toISOString()
-            };
-            
-            this.curhats.unshift(newCurhat);
-            this.syncCurhatToSheet(newCurhat);
-            this.activeModal = null;
-            this.showNotif('✅ Terima kasih sudah curhat, sabar ya menunggu balasan dari Wali.');
-        },
-
-        // ============ ADMIN FEATURES ============
-        getStudentStatus(id) {
-            let c = this.curhats.find(c => c.student_id === id && !c.balasan);
-            if(!c) return '🟢';
-            return c.tingkat_darurat === 'Bantuan' ? '🔴' : '🟡';
-        },
-
-        getStudentName(id) {
-            let s = this.students.find(s => s.id === id);
-            return s ? s.name : 'Unknown';
-        },
-
-        replyCurhat(id) {
-            let c = this.curhats.find(c => c.id === id);
-            if(c) {
-                c.balasan = this.tempReply;
-                this.syncReplyToSheet(id, this.tempReply);
-                this.tempReply = '';
-                this.showNotif('Balasan terkirim!');
-            }
-        },
-
-        addStudent() {
-            if(this.newStudent.name && this.newStudent.nis) {
-                const newStudent = {
-                    id: 's'+Date.now(),
-                    ...this.newStudent,
-                    is_potensi_filled: false,
-                    perbuatan_baik_today: false,
-                    nilai: 0,
-                    sikap: 'Baik',
-                    catatan: '',
-                    potensi: {}
-                };
-                
-                this.students.push(newStudent);
-                this.newStudent = { name: '', nis: '', class: '' };
-                this.syncStudentToSheet(newStudent);
-                this.showNotif('Siswa ditambahkan!');
-            }
-        },
-
-        resetPass(id) {
-            this.showNotif('Password siswa direset ke: 51sw@qu');
-        },
-
-        deleteStudent(id) {
-            this.students = this.students.filter(s => s.id !== id);
-            this.syncAllStudents();
-            this.showNotif('Siswa dihapus.');
-        },
-
-        // ============ EXPORT EXCEL ============
-        exportExcel() {
-            let data = this.students.map(s => {
-                let jurnalCount = this.curhats.filter(c => c.student_id === s.id).length;
-                return {
-                    'Nama': s.name,
-                    'NIS': s.nis,
-                    'Kelas': s.class,
-                    'Nilai Akademik': s.nilai,
-                    'Sikap': s.sikap,
-                    'Catatan Khusus': s.catatan,
-                    'Jumlah Curhat': jurnalCount
-                }
-            });
-            
-            let ws = XLSX.utils.json_to_sheet(data);
-            const colWidths = Object.keys(data[0]).map(key => ({ 
-                wch: Math.max(key.length, ...data.map(d => String(d[key]).length)) 
-            }));
-            ws['!cols'] = colWidths;
-
-            let wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Laporan Siswa");
-            XLSX.writeFile(wb, "Laporan_DWali.xlsx");
-        },
-
-        // ============ HELPER ============
-        showNotif(text) {
-            this.notif.text = text;
-            this.notif.show = true;
-            setTimeout(() => { this.notif.show = false; }, 3000);
-        }
+// ============================================================
+// DATA STORE
+// ============================================================
+class DataStore {
+  constructor() {
+    this.data = this.loadFromStorage();
+    this.isOnline = false;
+    this.pendingSync = [];
+    this.init();
+  }
+  
+  init() {
+    this.checkConnection();
+    setInterval(() => this.checkConnection(), 30000);
+  }
+  
+  checkConnection() {
+    if (!CONFIG.USE_API) {
+      this.isOnline = false;
+      this.updateStatusUI(false);
+      return;
     }
+    fetch(CONFIG.API_URL + '?action=ping', { method: 'GET', mode: 'no-cors' })
+      .then(() => {
+        this.isOnline = true;
+        this.updateStatusUI(true);
+        this.syncPending();
+      })
+      .catch(() => {
+        this.isOnline = false;
+        this.updateStatusUI(false);
+      });
+  }
+  
+  updateStatusUI(online) {
+    const el = document.getElementById('connectionStatus');
+    const text = document.getElementById('statusText');
+    if (el) {
+      el.className = 'connection-status ' + (online ? 'online' : 'offline');
+      text.textContent = online ? 'Online' : 'Offline (Local)';
+    }
+  }
+  
+  loadFromStorage() {
+    try {
+      const stored = localStorage.getItem(CONFIG.STORAGE_KEY);
+      if (stored) {
+        const p = JSON.parse(stored);
+        if (!p.students) p.students = [];
+        if (!p.potensi) p.potensi = [];
+        if (!p.perbuatanBaik) p.perbuatanBaik = [];
+        if (!p.curhat) p.curhat = [];
+        if (!p.curhatReplies) p.curhatReplies = [];
+        if (!p.jurnal) p.jurnal = [];
+        if (!p.laporan) p.laporan = [];
+        if (!p.users) p.users = [];
+        return p;
+      }
+    } catch (e) {
+      console.warn('Error loading from storage:', e);
+    }
+    return this.getDefaultData();
+  }
+  
+  getDefaultData() {
+    return {
+      students: [
+        { id: 'stu_1', nis: '2026001', name: 'Ahmad Fauzi', password: '51sw@qu', wali_id: 'wali_1', class: '7A', is_potensi_filled: true, created_at: new Date().toISOString() },
+        { id: 'stu_2', nis: '2026002', name: 'Budi Santoso', password: '51sw@qu', wali_id: 'wali_1', class: '7A', is_potensi_filled: false, created_at: new Date().toISOString() }
+      ],
+      potensi: [
+        { id: 'pot_1', student_id: 'stu_1', minat: 'Sains,Teknologi', gaya_belajar: 'Visual', cita_cita: 'Menjadi dokter', kekuatan_karakter: 'Kreatif,Disiplin', ekstrakurikuler: 'Robotik', updated_at: new Date().toISOString() }
+      ],
+      perbuatanBaik: [
+        { id: 'pb_1', student_id: 'stu_1', action: 'Aku membantu teman mengerjakan PR', date: new Date().toISOString().split('T')[0], created_at: new Date().toISOString() }
+      ],
+      curhat: [
+        { id: 'cur_1', student_id: 'stu_1', untuk_siapa: 'Aku sendiri', kategori: 'Sekolah', sub_kategori: 'Pelajaran', tingkat_darurat: 'Aku butuh bantuan sekarang', cerita: 'Saya kesulitan dengan matematika', is_read: false, created_at: new Date().toISOString() }
+      ],
+      curhatReplies: [],
+      jurnal: [
+        { id: 'jrn_1', student_id: 'stu_1', emoji: '😊', cerita: 'Hari ini saya belajar matematika dengan semangat!', date: new Date().toISOString().split('T')[0], created_at: new Date().toISOString() }
+      ],
+      laporan: [],
+      users: [
+        { id: 'admin_1', email: 'admin@walidigital.com', password: 'd4Rm@app', role: 'super_admin', name: 'Admin Super', class: '-', created_at: new Date().toISOString() },
+        { id: 'wali_1', email: 'wali@walidigital.com', password: 'd4Rm@app', role: 'wali', name: 'Wali Kelas 7A', class: '7A', created_at: new Date().toISOString() }
+      ]
+    };
+  }
+  
+  saveToStorage() {
+    try {
+      localStorage.setItem(CONFIG.STORAGE_KEY, JSON.stringify(this.data));
+    } catch (e) {
+      console.warn('Error saving to storage:', e);
+    }
+  }
+  
+  // ============ STUDENTS ============
+  getStudents(waliId = null) {
+    if (waliId) {
+      return this.data.students.filter(s => s.wali_id === waliId);
+    }
+    return this.data.students;
+  }
+  
+  getStudent(id) {
+    return this.data.students.find(s => s.id === id);
+  }
+  
+  getStudentByNIS(nis) {
+    return this.data.students.find(s => s.nis === nis);
+  }
+  
+  getStudentByNameAndClass(name, class_) {
+    return this.data.students.find(s => s.name.toLowerCase() === name.toLowerCase() && s.class === class_);
+  }
+  
+  addStudent(student) {
+    if (this.getStudentByNIS(student.nis)) {
+      return { success: false, error: 'NIS sudah terdaftar' };
+    }
+    const newStudent = {
+      id: 'stu_' + Date.now(),
+      ...student,
+      is_potensi_filled: false,
+      created_at: new Date().toISOString()
+    };
+    this.data.students.push(newStudent);
+    this.saveToStorage();
+    this.syncToAPI('addStudent', newStudent);
+    return { success: true, id: newStudent.id };
+  }
+  
+  updateStudent(id, field, value) {
+    const student = this.getStudent(id);
+    if (!student) {
+      return { success: false, error: 'Siswa tidak ditemukan' };
+    }
+    student[field] = value;
+    this.saveToStorage();
+    this.syncToAPI('updateStudent', { id, field, value });
+    return { success: true };
+  }
+  
+  deleteStudent(id) {
+    const index = this.data.students.findIndex(s => s.id === id);
+    if (index === -1) {
+      return { success: false, error: 'Siswa tidak ditemukan' };
+    }
+    this.data.potensi = this.data.potensi.filter(p => p.student_id !== id);
+    this.data.perbuatanBaik = this.data.perbuatanBaik.filter(p => p.student_id !== id);
+    this.data.curhat = this.data.curhat.filter(c => c.student_id !== id);
+    this.data.curhatReplies = this.data.curhatReplies.filter(r => r.student_id !== id);
+    this.data.jurnal = this.data.jurnal.filter(j => j.student_id !== id);
+    this.data.laporan = this.data.laporan.filter(l => l.student_id !== id);
+    this.data.students.splice(index, 1);
+    this.saveToStorage();
+    this.syncToAPI('deleteStudent', { id });
+    return { success: true };
+  }
+  
+  // ============ POTENSI ============
+  getPotensi(studentId) {
+    return this.data.potensi.find(p => p.student_id === studentId);
+  }
+  
+  savePotensi(potensi) {
+    const existing = this.getPotensi(potensi.student_id);
+    if (existing) {
+      Object.assign(existing, potensi);
+      existing.updated_at = new Date().toISOString();
+    } else {
+      potensi.id = 'pot_' + Date.now();
+      potensi.updated_at = new Date().toISOString();
+      this.data.potensi.push(potensi);
+    }
+    const student = this.getStudent(potensi.student_id);
+    if (student) {
+      student.is_potensi_filled = true;
+    }
+    this.saveToStorage();
+    this.syncToAPI('savePotensi', potensi);
+    return { success: true };
+  }
+  
+  // ============ PERBUATAN BAIK ============
+  getPerbuatanHariIni(studentId) {
+    const today = new Date().toISOString().split('T')[0];
+    return this.data.perbuatanBaik.find(p => p.student_id === studentId && p.date === today);
+  }
+  
+  addPerbuatanBaik(studentId, action) {
+    if (this.getPerbuatanHariIni(studentId)) {
+      return { success: false, error: 'Sudah mencatat perbuatan baik hari ini' };
+    }
+    const perbuatan = {
+      id: 'pb_' + Date.now(),
+      student_id: studentId,
+      action: action,
+      date: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString()
+    };
+    this.data.perbuatanBaik.push(perbuatan);
+    this.saveToStorage();
+    this.syncToAPI('addPerbuatanBaik', perbuatan);
+    return { success: true, id: perbuatan.id };
+  }
+  
+  getPerbuatanBaik(studentId) {
+    return this.data.perbuatanBaik.filter(p => p.student_id === studentId);
+  }
+  
+  countPerbuatanBaik(studentId) {
+    return this.data.perbuatanBaik.filter(p => p.student_id === studentId).length;
+  }
+  
+  getPerbuatanTerakhir(studentId) {
+    const list = this.getPerbuatanBaik(studentId);
+    return list.length > 0 ? list[list.length - 1] : null;
+  }
+  
+  // ============ CURHAT ============
+  getCurhat(studentId = null) {
+    if (studentId) {
+      return this.data.curhat.filter(c => c.student_id === studentId);
+    }
+    return this.data.curhat;
+  }
+  
+  getCurhatByWali(waliId) {
+    const students = this.getStudents(waliId);
+    const studentIds = students.map(s => s.id);
+    return this.data.curhat.filter(c => studentIds.includes(c.student_id));
+  }
+  
+  getUnreadCurhat(waliId) {
+    return this.getCurhatByWali(waliId).filter(c => !c.is_read);
+  }
+  
+  addCurhat(curhat) {
+    const newCurhat = {
+      id: 'cur_' + Date.now(),
+      ...curhat,
+      is_read: false,
+      created_at: new Date().toISOString()
+    };
+    this.data.curhat.push(newCurhat);
+    this.saveToStorage();
+    this.syncToAPI('addCurhat', newCurhat);
+    return { success: true, id: newCurhat.id };
+  }
+  
+  // ============ CURHAT REPLIES ============
+  getCurhatReplies(curhatId) {
+    return this.data.curhatReplies.filter(r => r.curhat_id === curhatId);
+  }
+  
+  addCurhatReply(curhatId, studentId, sender, senderName, message, isWali = false) {
+    const reply = {
+      id: 'rep_' + Date.now(),
+      curhat_id: curhatId,
+      student_id: studentId,
+      sender: sender,
+      sender_name: senderName,
+      message: message,
+      is_wali: isWali,
+      created_at: new Date().toISOString()
+    };
+    this.data.curhatReplies.push(reply);
+    
+    if (isWali) {
+      const curhat = this.data.curhat.find(c => c.id === curhatId);
+      if (curhat) curhat.is_read = true;
+    }
+    
+    this.saveToStorage();
+    this.syncToAPI('addCurhatReply', reply);
+    return { success: true, id: reply.id };
+  }
+  
+  // ============ JURNAL ============
+  getJurnal(studentId) {
+    return this.data.jurnal.filter(j => j.student_id === studentId);
+  }
+  
+  addJurnal(jurnal) {
+    const newJurnal = {
+      id: 'jrn_' + Date.now(),
+      ...jurnal,
+      date: new Date().toISOString().split('T')[0],
+      created_at: new Date().toISOString()
+    };
+    this.data.jurnal.push(newJurnal);
+    this.saveToStorage();
+    this.syncToAPI('addJurnal', newJurnal);
+    return { success: true };
+  }
+  
+  getJurnalTerakhir(studentId) {
+    const list = this.getJurnal(studentId);
+    return list.length > 0 ? list[list.length - 1] : null;
+  }
+  
+  // ============ USERS ============
+  getUsers(role = null) {
+    if (role) {
+      return this.data.users.filter(u => u.role === role);
+    }
+    return this.data.users;
+  }
+  
+  getUserByEmail(email) {
+    return this.data.users.find(u => u.email === email);
+  }
+  
+  getUser(id) {
+    return this.data.users.find(u => u.id === id);
+  }
+  
+  addUser(user) {
+    if (this.getUserByEmail(user.email)) {
+      return { success: false, error: 'Email sudah terdaftar' };
+    }
+    const newUser = {
+      id: 'user_' + Date.now(),
+      ...user,
+      created_at: new Date().toISOString()
+    };
+    this.data.users.push(newUser);
+    this.saveToStorage();
+    this.syncToAPI('addUser', newUser);
+    return { success: true, id: newUser.id };
+  }
+  
+  deleteUser(id) {
+    const user = this.getUser(id);
+    if (user && user.role === 'super_admin') {
+      return { success: false, error: 'Tidak bisa menghapus Admin Super' };
+    }
+    const index = this.data.users.findIndex(u => u.id === id);
+    if (index === -1) {
+      return { success: false, error: 'User tidak ditemukan' };
+    }
+    this.data.users.splice(index, 1);
+    this.saveToStorage();
+    this.syncToAPI('deleteUser', { id });
+    return { success: true };
+  }
+  
+  // ============ LAPORAN ============
+  getLaporan(studentId) {
+    return this.data.laporan.filter(l => l.student_id === studentId);
+  }
+  
+  // ============ SYNC ============
+  syncToAPI(action, data) {
+    if (!this.isOnline || !CONFIG.USE_API) {
+      this.pendingSync.push({ action, data });
+      return;
+    }
+    const params = new URLSearchParams({ action, ...data });
+    fetch(CONFIG.API_URL + '?' + params.toString(), { method: 'GET' })
+      .catch(err => {
+        console.warn('Sync failed:', err);
+        this.pendingSync.push({ action, data });
+      });
+  }
+  
+  syncPending() {
+    if (!this.isOnline || this.pendingSync.length === 0) return;
+    const batch = [...this.pendingSync];
+    this.pendingSync = [];
+    batch.forEach(({ action, data }) => this.syncToAPI(action, data));
+  }
 }
+
+// ============================================================
+// INISIALISASI
+// ============================================================
+const store = new DataStore();
+let currentStudent = null;
+let currentUser = null;
+let currentWali = null;
+let currentRole = null;
+let curhatStep = 0;
+let curhatAnswers = {};
+let perbuatanToday = false;
+let selectedCurhatId = null;
+let detailStudentId = null;
+let loginRole = 'student';
+let currentCurhatId = null;
+
+// ============================================================
+// LOGIN FUNCTIONS
+// ============================================================
+function setLoginRole(role) {
+  loginRole = role;
+  document.getElementById('loginRoleStudent').className = 'btn flex-1 ' + (role === 'student' ? 'btn-primary-custom' : 'btn-ghost');
+  document.getElementById('loginRoleWali').className = 'btn flex-1 ' + (role === 'wali' ? 'btn-primary-custom' : 'btn-ghost');
+  document.getElementById('loginRoleAdmin').className = 'btn flex-1 ' + (role === 'admin' ? 'btn-primary-custom' : 'btn-ghost');
+  document.getElementById('studentLoginForm').classList.toggle('hidden', role !== 'student');
+  document.getElementById('waliLoginForm').classList.toggle('hidden', role !== 'wali');
+  document.getElementById('adminLoginForm').classList.toggle('hidden', role !== 'admin');
+  document.getElementById('loginError').classList.add('hidden');
+}
+
+function loginStudent() {
+  const name = document.getElementById('studentName').value.trim();
+  const class_ = document.getElementById('studentClass').value.trim();
+  const password = document.getElementById('studentPassword').value || '51sw@qu';
+  
+  if (!name || !class_) {
+    showLoginError('Mohon isi nama dan kelas');
+    return;
+  }
+  
+  const student = store.getStudentByNameAndClass(name, class_);
+  if (!student) {
+    showLoginError('Siswa tidak ditemukan. Periksa nama dan kelas.');
+    return;
+  }
+  
+  if (student.password !== password) {
+    showLoginError('PIN salah. Default: 51sw@qu');
+    return;
+  }
+  
+  currentStudent = student;
+  currentRole = 'student';
+  showStudentDashboard();
+}
+
+function loginWali() {
+  const email = document.getElementById('waliEmail').value.trim();
+  const password = document.getElementById('waliPassword').value || 'd4Rm@app';
+  
+  if (!email) {
+    showLoginError('Mohon isi email');
+    return;
+  }
+  
+  const user = store.getUserByEmail(email);
+  if (!user) {
+    showLoginError('Email tidak ditemukan');
+    return;
+  }
+  
+  if (user.password !== password) {
+    showLoginError('Password salah. Default: d4Rm@app');
+    return;
+  }
+  
+  if (user.role !== 'wali') {
+    showLoginError('Akun ini bukan Wali Kelas');
+    return;
+  }
+  
+  currentUser = user;
+  currentWali = user;
+  currentRole = 'wali';
+  showWaliDashboard();
+}
+
+function loginAdmin() {
+  const email = document.getElementById('adminEmail').value.trim();
+  const password = document.getElementById('adminPassword').value || 'd4Rm@app';
+  
+  if (!email) {
+    showLoginError('Mohon isi email');
+    return;
+  }
+  
+  const user = store.getUserByEmail(email);
+  if (!user) {
+    showLoginError('Email tidak ditemukan');
+    return;
+  }
+  
+  if (user.password !== password) {
+    showLoginError('Password salah. Default: d4Rm@app');
+    return;
+  }
+  
+  if (user.role !== 'super_admin') {
+    showLoginError('Akun ini bukan Admin Super');
+    return;
+  }
+  
+  currentUser = user;
+  currentRole = 'admin';
+  showAdminDashboard();
+}
+
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  el.textContent = msg;
+  el.classList.remove('hidden');
+}
+
+function showStudentDashboard() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.remove('hidden');
+  document.getElementById('waliDashboard').classList.add('hidden');
+  document.getElementById('adminDashboard').classList.add('hidden');
+  document.getElementById('studentNameDisplay').textContent = currentStudent.name;
+  updateDateTime();
+  setInterval(updateDateTime, 1000);
+  updateMotivation();
+  updatePotensiStatus();
+  updatePerbuatanStatus();
+  renderMiniJurnal();
+  loadRiwayat();
+}
+
+function showWaliDashboard() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.add('hidden');
+  document.getElementById('waliDashboard').classList.remove('hidden');
+  document.getElementById('adminDashboard').classList.add('hidden');
+  document.getElementById('waliNameDisplay').textContent = currentWali.name;
+  renderWaliDashboard();
+  switchWaliTab('siswa');
+}
+
+function showAdminDashboard() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('studentDashboard').classList.add('hidden');
+  document.getElementById('waliDashboard').classList.add('hidden');
+  document.getElementById('adminDashboard').classList.remove('hidden');
+  document.getElementById('adminNameDisplay').textContent = currentUser.name;
+  renderAdminDashboard();
+  switchAdminTab('wali');
+}
+
+function logout() {
+  if (confirm('Yakin ingin keluar?')) {
+    currentStudent = null;
+    currentUser = null;
+    currentWali = null;
+    currentRole = null;
+    document.getElementById('loginPage').classList.remove('hidden');
+    document.getElementById('studentDashboard').classList.add('hidden');
+    document.getElementById('waliDashboard').classList.add('hidden');
+    document.getElementById('adminDashboard').classList.add('hidden');
+    ['studentName', 'studentClass', 'studentPassword', 'waliEmail', 'waliPassword', 'adminEmail', 'adminPassword'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  }
+}
+
+// ============================================================
+// STUDENT DASHBOARD FUNCTIONS
+// ============================================================
+const quotes = [
+  "Jadilah versi terbaik dari dirimu hari ini.",
+  "Kesuksesan dimulai dari langkah kecil.",
+  "Yakinlah pada kemampuanmu.",
+  "Belajar dari kegagalan adalah awal kesuksesan.",
+  "Hari ini lebih baik dari kemarin.",
+  "Teruslah melangkah meski lambat.",
+  "Kebaikan kecil berdampak besar.",
+  "Jangan bandingkan dirimu dengan orang lain.",
+  "Percayalah pada proses.",
+  "Berani mencoba adalah kunci.",
+  "Jadilah matahari untuk orang lain.",
+  "Sabar dan syukur adalah kekuatan.",
+  "Mimpi besar memerlukan aksi besar.",
+  "Jangan menyerah sebelum mencoba.",
+  "Hari ini adalah anugerah.",
+  "Setiap orang memiliki kelebihan.",
+  "Fokus pada hal yang bisa kamu kontrol.",
+  "Senyum adalah sedekah.",
+  "Kamu lebih kuat dari yang kamu kira.",
+  "Bersyukur membawa kebahagiaan."
+];
+
+let lastMotivationIndex = -1;
+
+function updateMotivation() {
+  let idx;
+  do {
+    idx = Math.floor(Math.random() * quotes.length);
+  } while (idx === lastMotivationIndex && quotes.length > 1);
+  lastMotivationIndex = idx;
+  document.getElementById('motivationText').textContent = quotes[idx];
+}
+
+function updateDateTime() {
+  const now = new Date();
+  document.getElementById('dateDisplay').textContent = now.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric'
+  });
+  document.getElementById('clockDisplay').textContent = now.toLocaleTimeString('id-ID', {
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}
+
+function navigateTo(page) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  if (page === 'home') {
+    document.querySelector('.nav-btn:nth-child(1)').classList.add('active');
+    document.getElementById('studentContent').style.display = 'block';
+  } else {
+    alert('Navigasi ke ' + page + ' (simulasi)');
+  }
+}
+
+function openModal(id) {
+  document.getElementById(id).checked = true;
+  if (id === 'curhatModal') {
+    // Reset curhat flow
+    curhatStep = 0;
+    curhatAnswers = {};
+    currentCurhatId = null;
+    document.getElementById('curhatResult').classList.add('hidden');
+    document.getElementById('curhatTextArea').classList.add('hidden');
+    document.getElementById('curhatReplyArea').classList.add('hidden');
+    document.getElementById('curhatOptions').innerHTML = '';
+    document.getElementById('curhatFlow').innerHTML = '';
+    document.getElementById('curhatReplies').innerHTML = '';
+    document.getElementById('curhatReplyInput').value = '';
+    showCurhatQuestion();
+  }
+}
+
+// ============================================================
+// POTENSI
+// ============================================================
+function updatePotensiStatus() {
+  if (currentStudent && currentStudent.is_potensi_filled) {
+    document.getElementById('potensiForm').classList.add('hidden');
+    document.getElementById('potensiDone').classList.remove('hidden');
+  } else {
+    document.getElementById('potensiForm').classList.remove('hidden');
+    document.getElementById('potensiDone').classList.add('hidden');
+  }
+}
+
+document.getElementById('simpanPotensi')?.addEventListener('click', function() {
+  if (!currentStudent) return;
+  
+  const potensi = {
+    student_id: currentStudent.id,
+    minat: document.getElementById('minat').value,
+    gaya_belajar: document.getElementById('gayaBelajar').value,
+    cita_cita: document.getElementById('citaCita').value || 'Belum diisi',
+    kekuatan_karakter: document.getElementById('karakter').value,
+    ekstrakurikuler: document.getElementById('ekskul').value || '-'
+  };
+  
+  const result = store.savePotensi(potensi);
+  if (result.success) {
+    currentStudent = store.getStudent(currentStudent.id);
+    updatePotensiStatus();
+    document.getElementById('recentActivity').innerHTML = '🗺️ Peta Potensi berhasil disimpan!';
+    alert('✅ Peta Potensi berhasil disimpan!');
+  }
+});
+
+// ============================================================
+// PERBUATAN BAIK
+// ============================================================
+function updatePerbuatanStatus() {
+  if (!currentStudent) return;
+  const pb = store.getPerbuatanHariIni(currentStudent.id);
+  const el = document.getElementById('perbuatanStatus');
+  if (pb) {
+    el.innerHTML = '✔️ Sudah';
+    el.className = 'text-xs text-emerald-400 font-semibold';
+    perbuatanToday = true;
+  } else {
+    el.innerHTML = 'Klik untuk catat';
+    el.className = 'text-xs text-slate-400';
+    perbuatanToday = false;
+  }
+}
+
+function catatPerbuatan(action) {
+  if (!currentStudent) return;
+  if (perbuatanToday) {
+    alert('✔️ Hari ini sudah mencatat perbuatan baik. Besok lagi ya!');
+    return;
+  }
+  
+  const result = store.addPerbuatanBaik(currentStudent.id, action);
+  if (result.success) {
+    const feedbacks = ['🌟 Good Job! Kamu hebat!', '💪 Luar biasa! Pertahankan ya!', '😇 Kamu anak baik!', '⚡ Keren sekali!'];
+    document.getElementById('perbuatanFeedback').innerHTML = feedbacks[Math.floor(Math.random() * feedbacks.length)];
+    perbuatanToday = true;
+    updatePerbuatanStatus();
+    document.getElementById('recentActivity').innerHTML = '⭐ Perbuatan baik: "' + action + '" ✅';
+    document.getElementById('perbuatanLain').value = '';
+    setTimeout(() => {
+      document.getElementById('perbuatanBaikModal').checked = false;
+    }, 2000);
+  } else {
+    alert(result.error);
+  }
+}
+
+// ============================================================
+// CURHAT (DIPERBAIKI)
+// ============================================================
+function showCurhatQuestion() {
+  const flow = document.getElementById('curhatFlow');
+  const opts = document.getElementById('curhatOptions');
+  opts.innerHTML = '';
+  let question = '', options = [];
+
+  if (curhatStep === 0) {
+    question = 'Siapakah kamu?';
+    options = ['Aku sendiri', 'Aku curhat untuk temanku'];
+  } else if (curhatStep === 1) {
+    question = 'Kategori, apakah ini masalah di rumah atau di sekolah?';
+    options = ['Rumah', 'Sekolah'];
+  } else if (curhatStep === 2) {
+    if (curhatAnswers.kategori === 'Rumah') {
+      question = 'Masalah di rumah?';
+      options = ['Orang tua', 'Saudara', 'Keuangan', 'Lainnya'];
+    } else {
+      question = 'Masalah di sekolah?';
+      options = ['Perundungan', 'Pelajaran', 'Teman', 'Guru', 'Lainnya'];
+    }
+  } else if (curhatStep === 3) {
+    question = 'Tingkat Darurat';
+    options = ['Aku cuma mau cerita', 'Aku butuh saran', 'Aku butuh bantuan sekarang'];
+  } else if (curhatStep === 4) {
+    flow.innerHTML += `<div class="bubble bubble-left">Masalahnya apa? (ceritakan dengan bebas)</div>`;
+    document.getElementById('curhatTextArea').classList.remove('hidden');
+    document.getElementById('curhatSubmit').onclick = submitCurhat;
+    return;
+  }
+
+  flow.innerHTML += `<div class="bubble bubble-left">${question}</div>`;
+  options.forEach(opt => {
+    const btn = document.createElement('button');
+    btn.className = 'btn btn-outline btn-sm m-1';
+    btn.innerText = opt;
+    btn.onclick = function() {
+      if (curhatStep === 0) curhatAnswers.siapa = opt;
+      else if (curhatStep === 1) curhatAnswers.kategori = opt;
+      else if (curhatStep === 2) curhatAnswers.sub = opt;
+      else if (curhatStep === 3) curhatAnswers.darurat = opt;
+      curhatStep++;
+      showCurhatQuestion();
+    };
+    opts.appendChild(btn);
+  });
+}
+
+function submitCurhat() {
+  if (!currentStudent) return;
+  
+  const cerita = document.getElementById('curhatCerita').value.trim() || 'Tidak ada cerita';
+  const curhatData = {
+    student_id: currentStudent.id,
+    untuk_siapa: curhatAnswers.siapa || 'Aku sendiri',
+    kategori: curhatAnswers.kategori || 'Sekolah',
+    sub_kategori: curhatAnswers.sub || 'Lainnya',
+    tingkat_darurat: curhatAnswers.darurat || 'Aku cuma mau cerita',
+    cerita: cerita
+  };
+  
+  const result = store.addCurhat(curhatData);
+  if (result.success) {
+    currentCurhatId = result.id;
+    document.getElementById('curhatTextArea').classList.add('hidden');
+    document.getElementById('curhatResult').classList.remove('hidden');
+    document.getElementById('recentActivity').innerHTML = '💬 Curhat terkirim: "' + cerita.substring(0, 30) + '..."';
+    
+    if (curhatAnswers.darurat === 'Aku butuh bantuan sekarang') {
+      alert('⚠️ Kami akan segera menghubungimu! Tetap tenang ya.');
+    }
+    
+    // Tampilkan area balasan setelah beberapa detik
+    setTimeout(function() {
+      document.getElementById('curhatResult').classList.add('hidden');
+      document.getElementById('curhatReplyArea').classList.remove('hidden');
+      renderCurhatReplies(currentCurhatId);
+    }, 2000);
+    
+    loadRiwayat();
+  }
+}
+
+function renderCurhatReplies(curhatId) {
+  const replies = store.getCurhatReplies(curhatId);
+  const container = document.getElementById('curhatReplies');
+  
+  if (!container) return;
+  
+  if (replies.length === 0) {
+    container.innerHTML = '<div class="text-xs text-slate-400 text-center">Belum ada balasan. Tunggu balasan dari Wali ya 😊</div>';
+    return;
+  }
+  
+  container.innerHTML = replies.map(function(r) {
+    const isWali = r.is_wali;
+    const senderName = isWali ? '👨‍🏫 ' + r.sender_name : '👤 ' + r.sender_name;
+    const time = new Date(r.created_at).toLocaleString('id-ID');
+    return `
+      <div class="curhat-message ${isWali ? 'curhat-message-wali' : 'curhat-message-siswa'}">
+        <div class="message-sender ${isWali ? 'message-sender-wali' : 'message-sender-siswa'}">${senderName}</div>
+        <div>${r.message}</div>
+        <div class="message-time">${time}</div>
+      </div>
+    `;
+  }).join('');
+  
+  // Scroll ke bawah
+  container.scrollTop = container.scrollHeight;
+}
+
+function sendCurhatReply() {
+  // Cek apakah user sudah login
+  if (!currentStudent && !currentWali) {
+    alert('Silakan login terlebih dahulu');
+    return;
+  }
+  
+  const input = document.getElementById('curhatReplyInput');
+  if (!input) return;
+  
+  const message = input.value.trim();
+  if (!message) {
+    alert('Tulis pesan terlebih dahulu');
+    return;
+  }
+  
+  let curhatId = currentCurhatId;
+  if (!curhatId) {
+    // Cari curhat terakhir siswa
+    const curhats = store.getCurhat(currentStudent ? currentStudent.id : null);
+    if (curhats.length > 0) {
+      curhatId = curhats[curhats.length - 1].id;
+    } else {
+      alert('Tidak ada curhat yang aktif');
+      return;
+    }
+  }
+  
+  const isWali = currentRole === 'wali';
+  const senderName = isWali ? currentWali.name : currentStudent.name;
+  const studentId = isWali ? currentWali.id : currentStudent.id;
+  
+  const result = store.addCurhatReply(curhatId, studentId, isWali ? 'wali' : 'student', senderName, message, isWali);
+  
+  if (result.success) {
+    input.value = '';
+    renderCurhatReplies(curhatId);
+    document.getElementById('recentActivity').innerHTML = '💬 Balasan terkirim: "' + message.substring(0, 30) + '..."';
+    
+    // Jika dari dashboard wali, refresh inbox
+    if (isWali) {
+      renderCurhatInbox();
+    }
+  } else {
+    alert('Gagal mengirim balasan: ' + (result.error || 'Unknown error'));
+  }
+}
+
+// ============================================================
+// JURNAL
+// ============================================================
+function pilihEmoji(emoji) {
+  document.getElementById('jurnalEmoji').value = emoji;
+  document.querySelectorAll('#jurnalModal .text-3xl span').forEach(function(s) {
+    s.style.transform = s.textContent.trim() === emoji ? 'scale(1.4)' : 'scale(1)';
+    s.style.transition = 'transform 0.2s';
+    s.style.filter = s.textContent.trim() === emoji ? 'drop-shadow(0 0 10px rgba(139,92,246,0.5))' : 'none';
+  });
+}
+
+function simpanJurnal() {
+  if (!currentStudent) return;
+  
+  const emoji = document.getElementById('jurnalEmoji').value;
+  const cerita = document.getElementById('jurnalCerita').value.trim() || 'Hari ini biasa saja.';
+  
+  const result = store.addJurnal({
+    student_id: currentStudent.id,
+    emoji: emoji,
+    cerita: cerita
+  });
+  
+  if (result.success) {
+    document.getElementById('jurnalFeedback').innerHTML = '✅ Jurnal tersimpan!';
+    document.getElementById('recentActivity').innerHTML = '📖 Jurnal: ' + cerita.substring(0, 20) + '...';
+    renderMiniJurnal();
+    document.getElementById('jurnalCerita').value = '';
+    document.getElementById('jurnalEmoji').value = '😊';
+    setTimeout(function() {
+      document.getElementById('jurnalModal').checked = false;
+      document.getElementById('jurnalFeedback').innerHTML = '';
+    }, 1500);
+  }
+}
+
+function renderMiniJurnal() {
+  if (!currentStudent) return;
+  const jurnalList = store.getJurnal(currentStudent.id);
+  const container = document.getElementById('miniJurnal');
+  if (jurnalList.length === 0) {
+    container.innerHTML = '<div class="text-slate-400">Belum ada jurnal.</div>';
+    return;
+  }
+  container.innerHTML = jurnalList.slice(-3).reverse().map(function(j) {
+    return `<div class="flex gap-2 items-start p-1 border-b border-slate-700/20">
+      <span class="text-lg">${j.emoji || '📖'}</span>
+      <div>
+        <div class="text-slate-300">${j.cerita}</div>
+        <div class="text-slate-500 text-xs">${new Date(j.created_at).toLocaleDateString('id-ID')}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ============================================================
+// RIWAYAT CURHAT (DIPERBAIKI)
+// ============================================================
+function loadRiwayat() {
+  if (!currentStudent) return;
+  const curhatList = store.getCurhat(currentStudent.id);
+  const list = document.getElementById('riwayatList');
+  
+  if (curhatList.length === 0) {
+    list.innerHTML = '<div class="text-slate-400 text-center py-4">Belum ada curhat.</div>';
+    return;
+  }
+  
+  list.innerHTML = curhatList.map(function(c) {
+    const replies = store.getCurhatReplies(c.id);
+    const lastReply = replies.length > 0 ? replies[replies.length - 1] : null;
+    const replyCount = replies.length;
+    
+    let statusText = '⏳ Menunggu Balasan';
+    let statusColor = 'text-yellow-400';
+    if (replyCount > 0) {
+      statusText = '💬 ' + replyCount + ' balasan';
+      statusColor = 'text-emerald-400';
+    }
+    
+    return `<div class="border-b border-slate-700/20 py-3">
+      <div class="flex justify-between items-start">
+        <div>
+          <div class="font-medium">${c.untuk_siapa || 'Siswa'}</div>
+          <div class="text-xs text-slate-400">${new Date(c.created_at).toLocaleString()}</div>
+        </div>
+        <span class="text-xs ${statusColor}">${statusText}</span>
+      </div>
+      <div class="text-sm mt-1">${c.cerita}</div>
+      ${replyCount > 0 ? `
+        <div class="mt-2 text-xs text-slate-400">
+          <i class="fas fa-reply mr-1"></i> Balasan terakhir: ${lastReply ? lastReply.message.substring(0, 40) + (lastReply.message.length > 40 ? '...' : '') : ''}
+          <span class="block text-slate-500 text-xs mt-1">dari ${lastReply ? lastReply.sender_name : ''}</span>
+        </div>
+      ` : ''}
+      <button onclick="openCurhatDetail('${c.id}')" class="btn btn-primary-custom btn-xs mt-2">
+        <i class="fas fa-comment mr-1"></i> Lihat Diskusi
+      </button>
+    </div>`;
+  }).join('');
+}
+
+function openCurhatDetail(curhatId) {
+  currentCurhatId = curhatId;
+  const curhat = store.data.curhat.find(function(c) { return c.id === curhatId; });
+  if (!curhat) return;
+  
+  // Reset modal curhat
+  document.getElementById('curhatFlow').innerHTML = '';
+  document.getElementById('curhatOptions').innerHTML = '';
+  document.getElementById('curhatTextArea').classList.add('hidden');
+  document.getElementById('curhatResult').classList.add('hidden');
+  document.getElementById('curhatReplyArea').classList.remove('hidden');
+  
+  // Tampilkan curhat awal
+  const flow = document.getElementById('curhatFlow');
+  flow.innerHTML = `
+    <div class="bubble bubble-left">${curhat.cerita}</div>
+    <div class="text-xs text-slate-400 mt-1 ml-2">${new Date(curhat.created_at).toLocaleString()}</div>
+    <div class="text-xs mt-1 ml-2">
+      <span class="status-badge ${curhat.tingkat_darurat === 'Aku butuh bantuan sekarang' ? 'status-red' : 'status-yellow'}">${curhat.tingkat_darurat}</span>
+      <span class="ml-2 text-slate-400">${curhat.kategori} · ${curhat.sub_kategori}</span>
+    </div>
+  `;
+  
+  renderCurhatReplies(curhatId);
+  document.getElementById('curhatModal').checked = true;
+}
+
+function showRiwayat() {
+  loadRiwayat();
+  document.getElementById('riwayatPanel').classList.remove('hidden');
+}
+
+function closeRiwayat() {
+  document.getElementById('riwayatPanel').classList.add('hidden');
+}
+
+// ============================================================
+// WALI DASHBOARD FUNCTIONS
+// ============================================================
+function renderWaliDashboard() {
+  if (!currentWali) {
+    console.warn('⚠️ currentWali tidak tersedia');
+    return;
+  }
+  
+  const students = store.getStudents(currentWali.id);
+  const curhatList = store.getCurhatByWali(currentWali.id);
+  const unread = curhatList.filter(function(c) { return !c.is_read; });
+  const darurat = curhatList.filter(function(c) { return c.tingkat_darurat === 'Aku butuh bantuan sekarang' && !c.is_read; });
+  
+  const totalSiswa = document.getElementById('totalSiswa');
+  const curhatDarurat = document.getElementById('curhatDarurat');
+  const curhatBelumDibaca = document.getElementById('curhatBelumDibaca');
+  
+  if (totalSiswa) totalSiswa.textContent = students.length;
+  if (curhatDarurat) curhatDarurat.textContent = darurat.length;
+  if (curhatBelumDibaca) curhatBelumDibaca.textContent = unread.length;
+  
+  renderStudentList();
+}
+
+function switchWaliTab(tab) {
+  ['Siswa', 'Curhat', 'Laporan'].forEach(function(t) {
+    const btn = document.getElementById('tab' + t);
+    const content = document.getElementById('tab' + t + 'Content');
+    const isActive = t.toLowerCase() === tab;
+    btn.className = 'px-4 py-2 text-sm font-medium ' + (isActive ? 'tab-active' : '');
+    btn.style.color = isActive ? '' : 'var(--text-muted)';
+    content.classList.toggle('hidden', !isActive);
+  });
+  if (tab === 'curhat') renderCurhatInbox();
+  if (tab === 'laporan') renderLaporanList();
+}
+
+function renderStudentList() {
+  if (!currentWali) {
+    console.warn('⚠️ currentWali tidak tersedia');
+    return;
+  }
+  
+  const students = store.getStudents(currentWali.id);
+  const list = document.getElementById('studentList');
+  
+  if (!list) {
+    console.error('❌ Element studentList tidak ditemukan');
+    return;
+  }
+  
+  if (!students || students.length === 0) {
+    list.innerHTML = `
+      <div class="text-center py-8" style="color: var(--text-muted);">
+        <i class="fas fa-users-slash text-3xl mb-2" style="display:block;"></i>
+        Belum ada siswa
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = students.map(function(s) {
+    const curhatList = store.getCurhat(s.id);
+    const unread = curhatList.filter(function(c) { return !c.is_read; }).length;
+    const hasDarurat = curhatList.some(function(c) { return c.tingkat_darurat === 'Aku butuh bantuan sekarang' && !c.is_read; });
+    
+    let statusBadge = '<span class="status-badge status-green">Aktif</span>';
+    if (hasDarurat) {
+      statusBadge = '<span class="status-badge status-red"><i class="fas fa-exclamation-triangle mr-1"></i>Darurat</span>';
+    } else if (unread > 0) {
+      statusBadge = '<span class="status-badge status-yellow">' + unread + ' curhat</span>';
+    }
+    
+    return `
+      <div class="student-card card-glass p-3 flex items-center justify-between fade-in">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showStudentDetail('${s.id}')">
+          <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(239,68,68,0.12));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:1px solid rgba(139,92,246,0.2);font-size:0.9rem;">
+            ${s.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div class="font-semibold text-sm">${s.name}</div>
+            <div class="text-xs" style="color: var(--text-muted);">
+              <i class="fas fa-hashtag mr-1"></i>${s.nis} · 
+              <i class="fas fa-layer-group ml-1 mr-1"></i>${s.class}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          ${statusBadge}
+          <button onclick="event.stopPropagation(); deleteStudentConfirm('${s.id}')" 
+                  class="btn btn-sm btn-ghost text-red-400 hover:text-red-300"
+                  style="padding:4px 8px;">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderCurhatInbox() {
+  if (!currentWali) return;
+  
+  const curhatList = store.getCurhatByWali(currentWali.id);
+  const inbox = document.getElementById('curhatInbox');
+  
+  if (!curhatList || curhatList.length === 0) {
+    inbox.innerHTML = `
+      <div class="text-center py-8" style="color: var(--text-muted);">
+        <i class="fas fa-inbox text-3xl mb-2" style="display:block;"></i>
+        Belum ada curhat masuk
+      </div>
+    `;
+    return;
+  }
+  
+  inbox.innerHTML = [...curhatList]
+    .sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); })
+    .map(function(c) {
+      const student = store.getStudent(c.student_id);
+      const isDarurat = c.tingkat_darurat === 'Aku butuh bantuan sekarang';
+      const replies = store.getCurhatReplies(c.id);
+      const replyCount = replies.length;
+      
+      return `
+        <div class="card-glass p-3 cursor-pointer fade-in ${!c.is_read ? 'border-l-4 border-l-purple-500' : ''}" 
+             onclick="openBalasCurhat('${c.id}')">
+          <div class="flex justify-between items-start">
+            <div>
+              <div class="font-semibold text-sm">
+                <i class="fas fa-user-graduate mr-1 icon-purple"></i>
+                ${student ? student.name : 'Unknown'}
+              </div>
+              <div class="text-xs" style="color: var(--text-muted);">
+                <i class="fas fa-tag mr-1"></i>${c.kategori} · ${c.sub_kategori}
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              ${isDarurat ? '<span class="status-badge status-red"><i class="fas fa-exclamation-triangle mr-1"></i>Darurat</span>' : ''}
+              ${!c.is_read ? '<span style="width:8px;height:8px;border-radius:50%;background:var(--purple-primary);box-shadow:0 0 8px var(--purple-primary);display:inline-block;"></span>' : ''}
+            </div>
+          </div>
+          <div class="text-sm mt-1" style="color: var(--text-secondary);">${c.cerita}</div>
+          <div class="flex justify-between items-center mt-1">
+            <div class="text-xs" style="color: var(--text-muted);">
+              <i class="fas fa-clock mr-1"></i>${new Date(c.created_at).toLocaleString('id-ID')}
+            </div>
+            ${replyCount > 0 ? '<span class="text-xs text-emerald-400"><i class="fas fa-reply mr-1"></i>' + replyCount + ' balasan</span>' : ''}
+          </div>
+        </div>
+      `;
+    }).join('');
+}
+
+// ============================================================
+// LAPORAN LENGKAP
+// ============================================================
+function renderLaporanList() {
+  if (!currentWali) return;
+  
+  const students = store.getStudents(currentWali.id);
+  const list = document.getElementById('laporanList');
+  
+  if (!students || students.length === 0) {
+    list.innerHTML = `
+      <div class="text-center py-8" style="color: var(--text-muted);">
+        <i class="fas fa-chart-bar text-3xl mb-2" style="display:block;"></i>
+        Belum ada data
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = students.map(function(s) {
+    const potensi = store.getPotensi(s.id);
+    const totalBaik = store.countPerbuatanBaik(s.id);
+    const perbuatanList = store.getPerbuatanBaik(s.id);
+    const jurnalList = store.getJurnal(s.id);
+    const curhatList = store.getCurhat(s.id);
+    const totalReplies = curhatList.reduce(function(sum, c) { return sum + store.getCurhatReplies(c.id).length; }, 0);
+    
+    // Ringkasan aktivitas terbaru
+    const allActivities = [];
+    perbuatanList.forEach(function(p) { allActivities.push({ type: 'perbuatan', data: p, date: p.created_at }); });
+    jurnalList.forEach(function(j) { allActivities.push({ type: 'jurnal', data: j, date: j.created_at }); });
+    curhatList.forEach(function(c) { allActivities.push({ type: 'curhat', data: c, date: c.created_at }); });
+    allActivities.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    const recentActivities = allActivities.slice(0, 5);
+    
+    return `
+      <div class="report-section fade-in">
+        <div class="flex justify-between items-center cursor-pointer" onclick="showStudentDetail('${s.id}')">
+          <div class="font-semibold text-sm">
+            <i class="fas fa-user-graduate mr-2 icon-purple"></i>${s.name}
+          </div>
+          <i class="fas fa-chevron-right text-xs" style="color: var(--text-muted);"></i>
+        </div>
+        
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <div class="bg-slate-800/30 p-2 rounded-lg text-center">
+            <div class="text-lg font-bold text-yellow-400">${totalBaik}</div>
+            <div class="text-xs text-slate-400">Perbuatan Baik</div>
+          </div>
+          <div class="bg-slate-800/30 p-2 rounded-lg text-center">
+            <div class="text-lg font-bold text-blue-400">${jurnalList.length}</div>
+            <div class="text-xs text-slate-400">Jurnal</div>
+          </div>
+          <div class="bg-slate-800/30 p-2 rounded-lg text-center">
+            <div class="text-lg font-bold text-purple-400">${curhatList.length}</div>
+            <div class="text-xs text-slate-400">Curhat</div>
+          </div>
+          <div class="bg-slate-800/30 p-2 rounded-lg text-center">
+            <div class="text-lg font-bold text-emerald-400">${totalReplies}</div>
+            <div class="text-xs text-slate-400">Balasan Curhat</div>
+          </div>
+        </div>
+        
+        ${potensi ? `
+          <div class="mt-2 text-xs text-slate-400">
+            <i class="fas fa-compass mr-1 icon-purple"></i> Potensi: ${potensi.minat} · ${potensi.gaya_belajar}
+          </div>
+        ` : ''}
+        
+        ${recentActivities.length > 0 ? `
+          <div class="mt-2">
+            <div class="text-xs text-slate-400 font-medium"><i class="fas fa-bolt mr-1 icon-yellow"></i> Aktivitas Terbaru:</div>
+            ${recentActivities.map(function(a) {
+              let icon = '📌';
+              let text = '';
+              if (a.type === 'perbuatan') {
+                icon = '⭐';
+                text = a.data.action;
+              } else if (a.type === 'jurnal') {
+                icon = '📖';
+                text = a.data.cerita;
+              } else if (a.type === 'curhat') {
+                icon = '💬';
+                text = a.data.cerita;
+              }
+              return '<div class="text-xs text-slate-400 mt-1">' + icon + ' ' + text.substring(0, 40) + (text.length > 40 ? '...' : '') + '</div>';
+            }).join('')}
+          </div>
+        ` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+function exportLaporan() {
+  if (!currentWali) return;
+  
+  const students = store.getStudents(currentWali.id);
+  let csv = 'Nama,NIS,Kelas,Peta Potensi,Perbuatan Baik,Jurnal,Curhat,Balasan Curhat\n';
+  
+  students.forEach(function(s) {
+    const potensi = store.getPotensi(s.id);
+    const totalBaik = store.countPerbuatanBaik(s.id);
+    const jurnalList = store.getJurnal(s.id);
+    const curhatList = store.getCurhat(s.id);
+    const totalReplies = curhatList.reduce(function(sum, c) { return sum + store.getCurhatReplies(c.id).length; }, 0);
+    
+    csv += '"' + s.name + '","' + s.nis + '","' + s.class + '","' + (potensi ? 'Sudah' : 'Belum') + '",' + totalBaik + ',' + jurnalList.length + ',' + curhatList.length + ',' + totalReplies + '\n';
+  });
+  
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'laporan_lengkap_siswa_' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  
+  alert('✅ Laporan lengkap berhasil diexport!');
+}
+
+// ============================================================
+// STUDENT DETAIL FUNCTIONS
+// ============================================================
+function showStudentDetail(id) {
+  detailStudentId = id;
+  const student = store.getStudent(id);
+  if (!student) return;
+  
+  const wali = store.getUser(student.wali_id);
+  
+  document.getElementById('detailSiswaNama').textContent = student.name;
+  document.getElementById('dNIS').textContent = student.nis;
+  document.getElementById('dKelas').textContent = student.class;
+  document.getElementById('dStatus').innerHTML = student.is_potensi_filled ? 
+    '<span class="text-emerald-400"><i class="fas fa-check-circle"></i> Potensi sudah diisi</span>' : 
+    '<span class="text-yellow-400"><i class="fas fa-clock"></i> Potensi belum diisi</span>';
+  document.getElementById('dBergabung').textContent = new Date(student.created_at).toLocaleDateString('id-ID');
+  document.getElementById('dWaliName').textContent = wali ? wali.name : '-';
+  
+  const potensi = store.getPotensi(id);
+  document.getElementById('dMinat').textContent = potensi?.minat || '-';
+  document.getElementById('dGayaBelajar').textContent = potensi?.gaya_belajar || '-';
+  document.getElementById('dCitaCita').textContent = potensi?.cita_cita || '-';
+  document.getElementById('dKarakter').textContent = potensi?.kekuatan_karakter || '-';
+  document.getElementById('dEkskul').textContent = potensi?.ekstrakurikuler || '-';
+  
+  const totalBaik = store.countPerbuatanBaik(id);
+  const jurnalList = store.getJurnal(id);
+  const curhatList = store.getCurhat(id);
+  const totalReplies = curhatList.reduce(function(sum, c) { return sum + store.getCurhatReplies(c.id).length; }, 0);
+  
+  document.getElementById('dTotalBaik').textContent = totalBaik;
+  document.getElementById('dTotalJurnal').textContent = jurnalList.length;
+  document.getElementById('dTotalCurhat').textContent = curhatList.length;
+  
+  const jurnalTerakhir = jurnalList.length > 0 ? jurnalList[jurnalList.length - 1] : null;
+  document.getElementById('dJurnalTerakhir').textContent = jurnalTerakhir ? 
+    jurnalTerakhir.emoji + ' ' + jurnalTerakhir.cerita : 
+    'Belum ada jurnal';
+  
+  const perbuatanTerakhir = store.getPerbuatanTerakhir(id);
+  document.getElementById('dPerbuatanTerakhir').textContent = perbuatanTerakhir ? 
+    perbuatanTerakhir.action : 
+    'Belum ada perbuatan baik';
+  
+  const curhatContainer = document.getElementById('dCurhatList');
+  if (curhatList.length === 0) {
+    curhatContainer.innerHTML = '<div class="text-center text-slate-400">Belum ada curhat</div>';
+  } else {
+    curhatContainer.innerHTML = curhatList.map(function(c) {
+      const replies = store.getCurhatReplies(c.id);
+      return `
+        <div class="p-2 rounded-lg bg-slate-800/30 border border-slate-700/30">
+          <div class="text-xs text-slate-400">${new Date(c.created_at).toLocaleString('id-ID')}</div>
+          <div class="text-sm mt-1">${c.cerita}</div>
+          ${replies.length > 0 ? `
+            <div class="mt-1 text-xs text-emerald-400">
+              <i class="fas fa-reply mr-1"></i> ${replies.length} balasan
+            </div>
+            <div class="text-xs text-slate-400 mt-1">
+              Terakhir: ${replies[replies.length - 1].message.substring(0, 40)}${replies[replies.length - 1].message.length > 40 ? '...' : ''}
+            </div>
+          ` : '<div class="text-xs text-yellow-400">⏳ Menunggu balasan</div>'}
+        </div>
+      `;
+    }).join('');
+  }
+  
+  switchDetailTab('profil');
+  document.getElementById('detailSiswaModal').checked = true;
+}
+
+function switchDetailTab(tab) {
+  ['Profil', 'Potensi', 'Aktivitas', 'Curhat'].forEach(function(t) {
+    const content = document.getElementById('detail' + t);
+    const btn = document.getElementById('detailTab' + t);
+    const isActive = t.toLowerCase() === tab;
+    content.classList.toggle('hidden', !isActive);
+    btn.className = 'px-3 py-1 text-xs font-medium' + (isActive ? ' tab-active' : '');
+    btn.style.color = isActive ? '' : 'var(--text-muted)';
+  });
+}
+
+// ============================================================
+// TAMBAH SISWA
+// ============================================================
+function showTambahSiswa() {
+  document.getElementById('siswaNIS').value = '';
+  document.getElementById('siswaNama').value = '';
+  document.getElementById('siswaKelas').value = currentWali?.class || '';
+  document.getElementById('siswaPIN').value = '51sw@qu';
+  document.getElementById('tambahSiswaModal').checked = true;
+}
+
+function tambahSiswa() {
+  const nis = document.getElementById('siswaNIS').value.trim();
+  const name = document.getElementById('siswaNama').value.trim();
+  const kelas = document.getElementById('siswaKelas').value.trim();
+  const pin = document.getElementById('siswaPIN').value.trim() || '51sw@qu';
+  
+  if (!nis) { alert('❌ Mohon isi NIS siswa'); document.getElementById('siswaNIS').focus(); return; }
+  if (!name) { alert('❌ Mohon isi Nama siswa'); document.getElementById('siswaNama').focus(); return; }
+  if (!kelas) { alert('❌ Mohon isi Kelas siswa'); document.getElementById('siswaKelas').focus(); return; }
+  
+  if (!currentWali || !currentWali.id) {
+    alert('❌ Error: Data Wali tidak ditemukan. Silakan login ulang.');
+    logout();
+    return;
+  }
+  
+  const result = store.addStudent({
+    nis: nis,
+    name: name,
+    password: pin,
+    wali_id: currentWali.id,
+    class: kelas
+  });
+  
+  if (result.success) {
+    alert('✅ Siswa berhasil ditambahkan!');
+    document.getElementById('tambahSiswaModal').checked = false;
+    renderWaliDashboard();
+    renderStudentList();
+    renderLaporanList();
+    document.getElementById('siswaNIS').value = '';
+    document.getElementById('siswaNama').value = '';
+    document.getElementById('siswaPIN').value = '51sw@qu';
+  } else {
+    alert('❌ ' + result.error);
+  }
+}
+
+// ============================================================
+// DELETE SISWA
+// ============================================================
+function deleteStudentConfirm(id) {
+  if (!id) { alert('❌ Error: ID siswa tidak valid'); return; }
+  const student = store.getStudent(id);
+  if (!student) { alert('❌ Siswa tidak ditemukan'); return; }
+  
+  if (confirm('Yakin ingin menghapus siswa "' + student.name + '" (NIS: ' + student.nis + ')?\n\nData curhat, jurnal, dan perbuatan baik juga akan terhapus.')) {
+    const result = store.deleteStudent(id);
+    if (result.success) {
+      alert('✅ Siswa berhasil dihapus!');
+      if (currentRole === 'wali') {
+        renderWaliDashboard();
+        renderStudentList();
+        renderLaporanList();
+      } else if (currentRole === 'admin') {
+        renderAdminDashboard();
+      }
+    } else {
+      alert('❌ Gagal menghapus siswa: ' + result.error);
+    }
+  }
+}
+
+// ============================================================
+// BALAS CURHAT (WALI)
+// ============================================================
+function openBalasCurhat(id) {
+  selectedCurhatId = id;
+  const curhat = store.data.curhat.find(function(x) { return x.id === id; });
+  if (!curhat) return;
+  
+  const student = store.getStudent(curhat.student_id);
+  document.getElementById('curhatDetail').innerHTML = `
+    <div class="font-semibold"><i class="fas fa-user-graduate mr-1 icon-purple"></i>${student ? student.name : 'Unknown'}</div>
+    <div class="text-xs mt-1 text-slate-400"><i class="fas fa-tag mr-1"></i>${curhat.kategori} · ${curhat.sub_kategori}</div>
+    ${curhat.tingkat_darurat === 'Aku butuh bantuan sekarang' ? '<div class="text-xs mt-1"><span class="status-badge status-red">DARURAT</span></div>' : ''}
+    <div class="mt-2 text-slate-300">${curhat.cerita}</div>
+    <div class="text-xs mt-1 text-slate-400"><i class="fas fa-clock mr-1"></i>${new Date(curhat.created_at).toLocaleString('id-ID')}</div>
+  `;
+  
+  // Tampilkan riwayat balasan
+  const replies = store.getCurhatReplies(id);
+  const repliesContainer = document.getElementById('curhatDetailReplies');
+  if (replies.length === 0) {
+    repliesContainer.innerHTML = '<div class="text-xs text-slate-400 text-center">Belum ada balasan</div>';
+  } else {
+    repliesContainer.innerHTML = replies.map(function(r) {
+      const isWali = r.is_wali;
+      const senderName = isWali ? '👨‍🏫 ' + r.sender_name : '👤 ' + r.sender_name;
+      const time = new Date(r.created_at).toLocaleString('id-ID');
+      return `
+        <div class="p-2 rounded-lg ${isWali ? 'bg-purple-500/10 border border-purple-500/20' : 'bg-blue-500/10 border border-blue-500/20'}">
+          <div class="text-xs font-medium ${isWali ? 'text-purple-400' : 'text-blue-400'}">${senderName}</div>
+          <div class="text-sm">${r.message}</div>
+          <div class="text-xs text-slate-400">${time}</div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  document.getElementById('balasanText').value = '';
+  document.getElementById('balasCurhatModal').checked = true;
+}
+
+function kirimBalasan() {
+  const balasan = document.getElementById('balasanText').value.trim();
+  if (!balasan) { alert('❌ Mohon tulis balasan'); return; }
+  
+  const curhat = store.data.curhat.find(function(x) { return x.id === selectedCurhatId; });
+  if (!curhat) { alert('❌ Curhat tidak ditemukan'); return; }
+  
+  // Tambahkan balasan sebagai reply
+  const result = store.addCurhatReply(
+    selectedCurhatId,
+    curhat.student_id,
+    'wali',
+    currentWali.name,
+    balasan,
+    true
+  );
+  
+  if (result.success) {
+    alert('✅ Balasan terkirim!');
+    document.getElementById('balasCurhatModal').checked = false;
+    renderCurhatInbox();
+    renderWaliDashboard();
+  } else {
+    alert('❌ ' + result.error);
+  }
+}
+
+// ============================================================
+// ADMIN DASHBOARD FUNCTIONS
+// ============================================================
+function renderAdminDashboard() {
+  if (!currentUser || currentUser.role !== 'super_admin') return;
+  
+  const allStudents = store.getStudents();
+  const allUsers = store.getUsers();
+  const waliUsers = allUsers.filter(function(u) { return u.role === 'wali'; });
+  const allCurhat = store.getCurhat();
+  
+  document.getElementById('totalWali').textContent = waliUsers.length;
+  document.getElementById('totalSiswaAdmin').textContent = allStudents.length;
+  document.getElementById('totalCurhatAdmin').textContent = allCurhat.length;
+  
+  renderWaliList();
+  renderAllStudentsList();
+  renderStatistik();
+}
+
+function switchAdminTab(tab) {
+  ['Wali', 'Siswa', 'Statistik'].forEach(function(t) {
+    const btn = document.getElementById('adminTab' + t);
+    const content = document.getElementById('adminTab' + t + 'Content');
+    const isActive = t.toLowerCase() === tab;
+    btn.className = 'px-4 py-2 text-sm font-medium ' + (isActive ? 'tab-active' : '');
+    btn.style.color = isActive ? '' : 'var(--text-muted)';
+    content.classList.toggle('hidden', !isActive);
+  });
+  if (tab === 'wali') renderWaliList();
+  if (tab === 'siswa') renderAllStudentsList();
+  if (tab === 'statistik') renderStatistik();
+}
+
+function renderWaliList() {
+  const waliUsers = store.getUsers('wali');
+  const list = document.getElementById('waliList');
+  
+  if (!waliUsers || waliUsers.length === 0) {
+    list.innerHTML = `
+      <div class="text-center py-8" style="color: var(--text-muted);">
+        <i class="fas fa-chalkboard-teacher text-3xl mb-2" style="display:block;"></i>
+        Belum ada Wali Kelas
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = waliUsers.map(function(w) {
+    const siswaCount = store.getStudents(w.id).length;
+    const curhatCount = store.getCurhatByWali(w.id).length;
+    const unreadCount = store.getUnreadCurhat(w.id).length;
+    
+    return `
+      <div class="wali-card card-glass p-3 flex items-center justify-between fade-in">
+        <div class="flex items-center gap-3">
+          <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(139,92,246,0.3),rgba(0,112,255,0.15));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:1px solid rgba(139,92,246,0.2);font-size:0.9rem;">
+            ${w.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div class="font-semibold text-sm">${w.name}</div>
+            <div class="text-xs" style="color: var(--text-muted);">
+              <i class="fas fa-envelope mr-1"></i>${w.email} · 
+              <i class="fas fa-layer-group mr-1"></i>${w.class}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-xs" style="color: var(--text-muted);">
+            <i class="fas fa-users mr-1"></i>${siswaCount}
+          </span>
+          ${unreadCount > 0 ? '<span class="status-badge status-yellow">' + unreadCount + ' curhat</span>' : ''}
+          <button onclick="event.stopPropagation(); deleteWaliConfirm('${w.id}')" 
+                  class="btn btn-sm btn-ghost text-red-400 hover:text-red-300"
+                  style="padding:4px 8px;">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderAllStudentsList() {
+  const allStudents = store.getStudents();
+  const list = document.getElementById('allStudentsList');
+  
+  if (!allStudents || allStudents.length === 0) {
+    list.innerHTML = `
+      <div class="text-center py-8" style="color: var(--text-muted);">
+        <i class="fas fa-users-slash text-3xl mb-2" style="display:block;"></i>
+        Belum ada siswa
+      </div>
+    `;
+    return;
+  }
+  
+  list.innerHTML = allStudents.map(function(s) {
+    const wali = store.getUser(s.wali_id);
+    const curhatList = store.getCurhat(s.id);
+    const unread = curhatList.filter(function(c) { return !c.is_read; }).length;
+    const replies = curhatList.reduce(function(sum, c) { return sum + store.getCurhatReplies(c.id).length; }, 0);
+    
+    return `
+      <div class="student-card card-glass p-3 flex items-center justify-between fade-in">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="showStudentDetail('${s.id}')">
+          <div style="width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,rgba(139,92,246,0.2),rgba(239,68,68,0.12));display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;border:1px solid rgba(139,92,246,0.2);font-size:0.9rem;">
+            ${s.name.charAt(0).toUpperCase()}
+          </div>
+          <div>
+            <div class="font-semibold text-sm">${s.name}</div>
+            <div class="text-xs" style="color: var(--text-muted);">
+              <i class="fas fa-hashtag mr-1"></i>${s.nis} · 
+              <i class="fas fa-layer-group ml-1 mr-1"></i>${s.class}
+              ${wali ? '· <i class="fas fa-chalkboard-teacher ml-1 mr-1"></i>' + wali.name : ''}
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          ${unread > 0 ? '<span class="status-badge status-yellow">' + unread + '</span>' : ''}
+          ${replies > 0 ? '<span class="text-xs text-emerald-400"><i class="fas fa-reply mr-1"></i>' + replies + '</span>' : ''}
+          <button onclick="event.stopPropagation(); deleteStudentConfirm('${s.id}')" 
+                  class="btn btn-sm btn-ghost text-red-400 hover:text-red-300"
+                  style="padding:4px 8px;">
+            <i class="fas fa-trash-alt"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function renderStatistik() {
+  const allStudents = store.getStudents();
+  const waliUsers = store.getUsers('wali');
+  const allCurhat = store.getCurhat();
+  const allJurnal = store.data.jurnal;
+  const allPerbuatan = store.data.perbuatanBaik;
+  const allReplies = store.data.curhatReplies;
+  
+  const classStats = {};
+  allStudents.forEach(function(s) {
+    if (!classStats[s.class]) classStats[s.class] = 0;
+    classStats[s.class]++;
+  });
+  
+  const curhatStats = {};
+  allCurhat.forEach(function(c) {
+    if (!curhatStats[c.kategori]) curhatStats[c.kategori] = 0;
+    curhatStats[c.kategori]++;
+  });
+  
+  const content = document.getElementById('statistikContent');
+  content.innerHTML = `
+    <div class="card-glass p-4">
+      <h4 class="font-bold text-sm"><i class="fas fa-school mr-2 icon-blue"></i>Statistik Sekolah</h4>
+      <div class="grid grid-cols-2 gap-3 mt-3">
+        <div class="bg-slate-800/30 p-3 rounded-lg text-center">
+          <div class="text-xl font-bold text-emerald-400">${allStudents.length}</div>
+          <div class="text-xs text-slate-400">Total Siswa</div>
+        </div>
+        <div class="bg-slate-800/30 p-3 rounded-lg text-center">
+          <div class="text-xl font-bold text-purple-400">${waliUsers.length}</div>
+          <div class="text-xs text-slate-400">Total Wali</div>
+        </div>
+        <div class="bg-slate-800/30 p-3 rounded-lg text-center">
+          <div class="text-xl font-bold text-yellow-400">${allCurhat.length}</div>
+          <div class="text-xs text-slate-400">Total Curhat</div>
+        </div>
+        <div class="bg-slate-800/30 p-3 rounded-lg text-center">
+          <div class="text-xl font-bold text-blue-400">${allJurnal.length}</div>
+          <div class="text-xs text-slate-400">Total Jurnal</div>
+        </div>
+        <div class="bg-slate-800/30 p-3 rounded-lg text-center">
+          <div class="text-xl font-bold text-yellow-400">${allPerbuatan.length}</div>
+          <div class="text-xs text-slate-400">Total Perbuatan Baik</div>
+        </div>
+        <div class="bg-slate-800/30 p-3 rounded-lg text-center">
+          <div class="text-xl font-bold text-purple-400">${allReplies.length}</div>
+          <div class="text-xs text-slate-400">Total Balasan Curhat</div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-glass p-4">
+      <h4 class="font-bold text-sm"><i class="fas fa-layer-group mr-2 icon-purple"></i>Statistik per Kelas</h4>
+      <div class="space-y-2 mt-3">
+        ${Object.keys(classStats).length === 0 ? 
+          '<div class="text-slate-400 text-sm">Belum ada data</div>' :
+          Object.keys(classStats).sort().map(function(k) {
+            return '<div class="flex justify-between items-center bg-slate-800/20 p-2 rounded-lg">' +
+              '<span class="text-sm">' + k + '</span>' +
+              '<span class="text-sm font-bold text-blue-400">' + classStats[k] + ' siswa</span>' +
+            '</div>';
+          }).join('')
+        }
+      </div>
+    </div>
+    
+    <div class="card-glass p-4">
+      <h4 class="font-bold text-sm"><i class="fas fa-tags mr-2 icon-green"></i>Kategori Curhat</h4>
+      <div class="space-y-2 mt-3">
+        ${Object.keys(curhatStats).length === 0 ? 
+          '<div class="text-slate-400 text-sm">Belum ada curhat</div>' :
+          Object.keys(curhatStats).map(function(k) {
+            return '<div class="flex justify-between items-center bg-slate-800/20 p-2 rounded-lg">' +
+              '<span class="text-sm">' + k + '</span>' +
+              '<span class="text-sm font-bold text-purple-400">' + curhatStats[k] + ' curhat</span>' +
+            '</div>';
+          }).join('')
+        }
+      </div>
+    </div>
+  `;
+}
+
+// ============================================================
+// TAMBAH WALI (ADMIN)
+// ============================================================
+function showTambahWali() {
+  document.getElementById('waliNama').value = '';
+  document.getElementById('waliEmailBaru').value = '';
+  document.getElementById('waliKelas').value = '';
+  document.getElementById('waliPasswordBaru').value = 'd4Rm@app';
+  document.getElementById('tambahWaliModal').checked = true;
+}
+
+function tambahWali() {
+  const name = document.getElementById('waliNama').value.trim();
+  const email = document.getElementById('waliEmailBaru').value.trim();
+  const kelas = document.getElementById('waliKelas').value.trim();
+  const password = document.getElementById('waliPasswordBaru').value.trim() || 'd4Rm@app';
+  
+  if (!name) { alert('❌ Mohon isi Nama Wali'); document.getElementById('waliNama').focus(); return; }
+  if (!email) { alert('❌ Mohon isi Email'); document.getElementById('waliEmailBaru').focus(); return; }
+  if (!kelas) { alert('❌ Mohon isi Kelas'); document.getElementById('waliKelas').focus(); return; }
+  
+  if (!email.includes('@')) {
+    alert('❌ Email tidak valid');
+    document.getElementById('waliEmailBaru').focus();
+    return;
+  }
+  
+  const result = store.addUser({
+    email: email,
+    password: password,
+    role: 'wali',
+    name: name,
+    class: kelas
+  });
+  
+  if (result.success) {
+    alert('✅ Wali Kelas "' + name + '" berhasil ditambahkan!\n\nEmail: ' + email + '\nPassword: ' + password);
+    document.getElementById('tambahWaliModal').checked = false;
+    renderAdminDashboard();
+    document.getElementById('waliNama').value = '';
+    document.getElementById('waliEmailBaru').value = '';
+    document.getElementById('waliKelas').value = '';
+  } else {
+    alert('❌ ' + result.error);
+  }
+}
+
+function deleteWaliConfirm(id) {
+  if (!id) { alert('❌ Error: ID wali tidak valid'); return; }
+  const wali = store.getUser(id);
+  if (!wali) { alert('❌ Wali tidak ditemukan'); return; }
+  
+  const siswaCount = store.getStudents(id).length;
+  if (siswaCount > 0) {
+    alert('❌ Tidak bisa menghapus "' + wali.name + '" karena masih memiliki ' + siswaCount + ' siswa.\n\nHarap pindahkan atau hapus siswa terlebih dahulu.');
+    return;
+  }
+  
+  if (confirm('Yakin ingin menghapus Wali Kelas "' + wali.name + '" (' + wali.email + ')?')) {
+    const result = store.deleteUser(id);
+    if (result.success) {
+      alert('✅ Wali berhasil dihapus!');
+      renderAdminDashboard();
+    } else {
+      alert('❌ ' + result.error);
+    }
+  }
+}
+
+// ============================================================
+// KEYBOARD SHORTCUT
+// ============================================================
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    if (!document.getElementById('loginPage').classList.contains('hidden')) {
+      if (loginRole === 'student') loginStudent();
+      else if (loginRole === 'wali') loginWali();
+      else if (loginRole === 'admin') loginAdmin();
+    }
+  }
+});
+
+// ============================================================
+// INITIALIZATION
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('loginPage').classList.remove('hidden');
+  document.getElementById('studentDashboard').classList.add('hidden');
+  document.getElementById('waliDashboard').classList.add('hidden');
+  document.getElementById('adminDashboard').classList.add('hidden');
+  setLoginRole('student');
+  
+  console.log('🏫 Wali Digital v5.1 - Fixed Curhat Replies');
+  console.log('📌 Default Login:');
+  console.log('  Siswa: Nama & Kelas sesuai data, PIN: 51sw@qu');
+  console.log('  Wali: wali@walidigital.com / d4Rm@app');
+  console.log('  Admin: admin@walidigital.com / d4Rm@app');
+});
 </script>
 </body>
 </html>
